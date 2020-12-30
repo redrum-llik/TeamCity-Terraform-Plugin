@@ -12,7 +12,7 @@ import jetbrains.buildServer.web.openapi.PluginDescriptor
 import java.util.*
 
 
-class TerraformRunnerRunType(runTypeRegistry: RunTypeRegistry, val myDescriptor: PluginDescriptor) : RunType() {
+class TerraformApplyRunType(runTypeRegistry: RunTypeRegistry, private val myDescriptor: PluginDescriptor) : RunType() {
     init {
         runTypeRegistry.registerRunType(this)
     }
@@ -22,11 +22,11 @@ class TerraformRunnerRunType(runTypeRegistry: RunTypeRegistry, val myDescriptor:
     }
 
     override fun getEditRunnerParamsJspFilePath(): String? {
-        return myDescriptor.getPluginResourcesPath("terraformRunnerParams.jsp")
+        return myDescriptor.getPluginResourcesPath("terraformApplyRunnerParams.jsp")
     }
 
     override fun getViewRunnerParamsJspFilePath(): String? {
-        return myDescriptor.getPluginResourcesPath("viewTerraformRunnerParams.jsp")
+        return myDescriptor.getPluginResourcesPath("viewTerraformApplyRunnerParams.jsp")
     }
 
     override fun getDefaultRunnerProperties(): MutableMap<String, String> {
@@ -35,15 +35,15 @@ class TerraformRunnerRunType(runTypeRegistry: RunTypeRegistry, val myDescriptor:
     }
 
     override fun getType(): String {
-        return CommonConst.RUNNER_TYPE
+        return CommonConst.RUNNER_APPLY_TYPE
     }
 
     override fun getDisplayName(): String {
-        return CommonConst.RUNNER_DISPLAY_NAME
+        return CommonConst.RUNNER_APPLY_DISPLAY_NAME
     }
 
     override fun getDescription(): String {
-        return CommonConst.RUNNER_DESCRIPTION
+        return CommonConst.RUNNER_APPLY_DESCRIPTION
     }
 
     override fun getRunnerSpecificRequirements(runParameters: MutableMap<String, String>): MutableList<Requirement> {

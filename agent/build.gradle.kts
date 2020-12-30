@@ -20,6 +20,7 @@ teamcity {
                 useSeparateClassloader = true
             }
         }
+        archiveName = "terraform-agent"
     }
 }
 

@@ -29,6 +29,7 @@ teamcity {
             description = "Provides runner for Terraform playbook execution"
             useSeparateClassloader = true
         }
+        archiveName = "terraform-plugin"
     }
 
     environments {
