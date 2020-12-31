@@ -1,7 +1,6 @@
 package jetbrains.buildServer.runner.terraformRunner
 
 import jetbrains.buildServer.requirements.Requirement
-import jetbrains.buildServer.requirements.RequirementType
 import jetbrains.buildServer.runner.terraform.TerraformRunnerConstants as CommonConst
 import jetbrains.buildServer.runner.terraform.TerraformRunnerInstanceConfiguration
 import jetbrains.buildServer.serverSide.InvalidProperty
@@ -12,7 +11,7 @@ import jetbrains.buildServer.web.openapi.PluginDescriptor
 import java.util.*
 
 
-class TerraformApplyRunType(runTypeRegistry: RunTypeRegistry, private val myDescriptor: PluginDescriptor) : RunType() {
+class TerraformRunType(runTypeRegistry: RunTypeRegistry, private val myDescriptor: PluginDescriptor) : RunType() {
     init {
         runTypeRegistry.registerRunType(this)
     }
@@ -22,11 +21,11 @@ class TerraformApplyRunType(runTypeRegistry: RunTypeRegistry, private val myDesc
     }
 
     override fun getEditRunnerParamsJspFilePath(): String? {
-        return myDescriptor.getPluginResourcesPath("terraformApplyRunnerParams.jsp")
+        return myDescriptor.getPluginResourcesPath("terraformRunnerParams.jsp")
     }
 
     override fun getViewRunnerParamsJspFilePath(): String? {
-        return myDescriptor.getPluginResourcesPath("viewTerraformApplyRunnerParams.jsp")
+        return myDescriptor.getPluginResourcesPath("viewTerraformRunnerParams.jsp")
     }
 
     override fun getDefaultRunnerProperties(): MutableMap<String, String> {
@@ -35,15 +34,15 @@ class TerraformApplyRunType(runTypeRegistry: RunTypeRegistry, private val myDesc
     }
 
     override fun getType(): String {
-        return CommonConst.RUNNER_APPLY_TYPE
+        return CommonConst.RUNNER_TYPE
     }
 
     override fun getDisplayName(): String {
-        return CommonConst.RUNNER_APPLY_DISPLAY_NAME
+        return CommonConst.RUNNER_DISPLAY_NAME
     }
 
     override fun getDescription(): String {
-        return CommonConst.RUNNER_APPLY_DESCRIPTION
+        return CommonConst.RUNNER_DESCRIPTION
     }
 
     override fun getRunnerSpecificRequirements(runParameters: MutableMap<String, String>): MutableList<Requirement> {

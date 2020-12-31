@@ -6,7 +6,7 @@ import jetbrains.buildServer.agent.runner.CommandLineBuildService
 import jetbrains.buildServer.agent.runner.CommandLineBuildServiceFactory
 import jetbrains.buildServer.runner.terraform.TerraformRunnerConstants
 
-class TerraformApplyRunnerCommandFactory : CommandLineBuildServiceFactory {
+class TerraformRunnerCommandLineFactory : CommandLineBuildServiceFactory {
     override fun createService(): CommandLineBuildService {
         return TerraformCommandBuildService()
     }
@@ -18,7 +18,7 @@ class TerraformApplyRunnerCommandFactory : CommandLineBuildServiceFactory {
     companion object {
         class TerraformApplyRunner : AgentBuildRunnerInfo {
             override fun getType(): String {
-                return TerraformRunnerConstants.RUNNER_APPLY_TYPE
+                return TerraformRunnerConstants.RUNNER_TYPE
             }
 
             override fun canRun(buildAgentConfiguration: BuildAgentConfiguration): Boolean {
