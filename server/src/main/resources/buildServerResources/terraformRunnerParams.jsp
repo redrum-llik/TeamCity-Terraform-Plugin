@@ -3,6 +3,7 @@
 <%@ taglib prefix="forms" tagdir="/WEB-INF/tags/forms" %>
 <%@ taglib prefix="l" tagdir="/WEB-INF/tags/layout" %>
 <%@ taglib prefix="bs" tagdir="/WEB-INF/tags" %>
+
 <jsp:useBean id="bean" class="jetbrains.buildServer.runner.terraformRunner.TerraformBean"/>
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
 
@@ -12,7 +13,7 @@
     <tr>
         <th>Command:</th>
         <td>
-            <props:selectProperty name="${bean.commandKey}" id="commandSelector" className="shortField" onchange="BS.Terraform.updateScriptType()">
+            <props:selectProperty name="${bean.commandKey}" id="commandSelector" className="shortField" onchange="BS.Terraform.updateCommand()">
                 <props:option value="${bean.commandInit}">${bean.commandInit}</props:option>
                 <props:option value="${bean.commandPlan}">${bean.commandPlan}</props:option>
                 <props:option value="${bean.commandApply}">${bean.commandApply}</props:option>
@@ -20,16 +21,91 @@
             <span class="error" id="error_${bean.commandKey}"></span>
         </td>
     </tr>
+    <tr id="plan_custom_output">
+        <th><label for="${bean.planCustomOutputPathKey}">Custom output path:</label></th>
+        <td>
+            <props:textProperty name="${bean.planCustomOutputPathKey}" className="longField"/>
+            <bs:vcsTree fieldId="${bean.planCustomOutputPathKey}"/>
+            <span class="smallNote">Custom path to the generated plan execution file, absolute or relative to the working directory</span>
+        </td>
+    </tr>
+    <tr class="advancedSetting" id="plan_do_init">
+        <th><label>Init:</label></th>
+        <td><props:checkboxProperty name="${bean.planDoInitKey}"/>
+            <label for="${bean.planDoInitKey}">Run "terraform init" command beforehand</label>
+            <br/>
+        </td>
+    </tr>
+    <tr class="advancedSetting" id="plan_do_destroy">
+        <th><label>Destroy:</label></th>
+        <td><props:checkboxProperty name="${bean.planDoDestroyKey}"/>
+            <label for="${bean.planDoDestroyKey}">Generate plan to destroy resources</label>
+            <br/>
+        </td>
+    </tr>
+    <tr id="apply_custom_backup">
+        <th><label for="${bean.applyCustomBackupPathKey}">Custom backup path:</label></th>
+        <td>
+            <props:textProperty name="${bean.applyCustomBackupPathKey}" className="longField"/>
+            <bs:vcsTree fieldId="${bean.applyCustomBackupPathKey}"/>
+            <span class="smallNote">Custom path to the backup state file, absolute or relative to the working directory</span>
+        </td>
+    </tr>
+    <tr class="advancedSetting" id="apply_do_auto_approve">
+        <th><label>Auto-approve:</label></th>
+        <td><props:checkboxProperty name="${bean.applyDoAutoApproveKey}"/>
+            <label for="${bean.applyDoAutoApproveKey}">Skip interactive approval before applying</label>
+            <br/>
+        </td>
+    </tr>
 </l:settingsGroup>
 
-<l:settingsGroup title="Run Parameters" className="advancedSetting">
+<l:settingsGroup title="Common Parameters" className="advancedSetting">
+    <tr class="advancedSetting" id="do_color">
+        <th><label>Enable color:</label></th>
+        <td><props:checkboxProperty name="${bean.doColorKey}"/>
+            <label for="${bean.doColorKey}">Enable color codes in the command output</label>
+            <br/>
+        </td>
+    </tr>
 </l:settingsGroup>
 
 <script type="text/javascript">
     BS.Terraform = {
-        updateScriptType : function() {
+        updateCommand: function () {
             var val = $('commandSelector').value;
+            if (val === "${bean.commandInit}") {
+                this.hideApplyControls()
+                this.hidePlanControls()
+            }
+            else if (val === "${bean.commandPlan}") {
+                this.hideApplyControls()
+                this.showPlanControls()
+            }
+            else {
+                this.hidePlanControls()
+                this.showApplyControls()
+            }
             BS.MultilineProperties.updateVisible();
+        },
+        showPlanControls: function () {
+            BS.Util.show($("plan_custom_output"))
+            BS.Util.show($("plan_do_init"))
+            BS.Util.show($("plan_do_destroy"))
+        },
+        hidePlanControls: function () {
+            BS.Util.hide($("plan_custom_output"))
+            BS.Util.hide($("plan_do_init"))
+            BS.Util.hide($("plan_do_destroy"))
+        },
+        showApplyControls: function () {
+            BS.Util.show($("apply_custom_backup"))
+            BS.Util.show($("apply_do_auto_approve"))
+        },
+        hideApplyControls: function () {
+            BS.Util.hide($("apply_custom_backup"))
+            BS.Util.hide($("apply_do_auto_approve"))
         }
-    BS.Terraform.updateScriptType();
+    }
+    BS.Terraform.updateCommand();
 </script>
