@@ -40,8 +40,7 @@ class CommandLineBuilder {
                 arguments.add(argName)
             }
             else -> {
-                arguments.add(argName)
-                arguments.add(value)
+                arguments.add("$argName=$value")
             }
         }
     }

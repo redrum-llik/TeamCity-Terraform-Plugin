@@ -51,6 +51,10 @@ class TerraformRunnerInstanceConfiguration(private val properties: Map<String, S
 
     // common parameters
 
+    fun getExtraArgs(): String? {
+        return properties[TerraformRunnerConstants.RUNNER_SETTING_EXTRA_ARGS]
+    }
+
     fun getDoColor(): Boolean {
         return properties[TerraformRunnerConstants.RUNNER_SETTING_DO_COLOR_KEY].toBoolean()
     }

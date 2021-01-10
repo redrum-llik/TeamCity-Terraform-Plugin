@@ -16,5 +16,6 @@ class TerraformBean {
     val applyCustomBackupPathKey: String = CommonConst.RUNNER_SETTING_APPLY_CUSTOM_BACKUP_KEY
     val applyDoAutoApproveKey: String = CommonConst.RUNNER_SETTING_APPLY_DO_AUTO_APPROVE
 
+    val extraArgsKey: String = CommonConst.RUNNER_SETTING_EXTRA_ARGS
     val doColorKey: String = CommonConst.RUNNER_SETTING_DO_COLOR_KEY
 }

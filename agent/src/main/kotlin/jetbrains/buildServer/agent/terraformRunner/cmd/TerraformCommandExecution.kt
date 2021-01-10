@@ -5,12 +5,18 @@ import jetbrains.buildServer.agent.runner.CommandExecution
 import jetbrains.buildServer.agent.runner.ProgramCommandLine
 import jetbrains.buildServer.agent.runner.TerminationAction
 
-abstract class TerraformCommandExecution(
-        private val programCommandLine: ProgramCommandLine,
-        private val buildRunnerContext: BuildRunnerContext,
-        private val flowId: String
+import java.io.File
+
+open class TerraformCommandExecution(
+        private val commandLine: ProgramCommandLine,
+        buildRunnerContext: BuildRunnerContext,
+        flowId: String
 ) : CommandExecution {
     private val myLogger = buildRunnerContext.build.buildLogger.getFlowLogger(flowId)
+
+    override fun processStarted(programCommandLine: String, workingDirectory: File) {
+        myLogger.message("Starting $programCommandLine, working directory: $workingDirectory")
+    }
 
     override fun onStandardOutput(text: String) {
         text.lines().forEach {
@@ -37,4 +43,11 @@ abstract class TerraformCommandExecution(
     override fun interruptRequested(): TerminationAction = TerminationAction.KILL_PROCESS_TREE
 
     override fun isCommandLineLoggingEnabled(): Boolean = true
+
+    override fun makeProgramCommandLine(): ProgramCommandLine {
+        return commandLine
+    }
+
+    override fun beforeProcessStarted() {
+    }
 }

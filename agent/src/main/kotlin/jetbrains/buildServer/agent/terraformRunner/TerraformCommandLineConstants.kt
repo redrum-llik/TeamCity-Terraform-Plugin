@@ -6,4 +6,10 @@ object TerraformCommandLineConstants {
     const val COMMAND_TERRAFORM = "terraform"
 
     const val PARAM_VERSION = "-version"
+    const val PARAM_CUSTOM_OUT = "-out"
+    const val PARAM_CUSTOM_BACKUP_OUT = "-backup"
+    const val PARAM_NO_COLOR = "-no-color"
+    const val PARAM_DESTROY = "-destroy"
+    const val PARAM_AUTO_APPROVE = "-auto-approve"
+    const val PARAM_VAR_FILE = "-var-file"
 }

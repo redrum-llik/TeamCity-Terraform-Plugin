@@ -61,6 +61,13 @@
 </l:settingsGroup>
 
 <l:settingsGroup title="Common Parameters" className="advancedSetting">
+    <tr id="extra_args">
+        <th><label for="${bean.extraArgsKey}">Additional arguments:</label></th>
+        <td>
+            <props:textProperty name="${bean.extraArgsKey}" className="longField"/>
+            <span class="smallNote">Additional arguments to be passed to the command</span>
+        </td>
+    </tr>
     <tr class="advancedSetting" id="do_color">
         <th><label>Enable color:</label></th>
         <td><props:checkboxProperty name="${bean.doColorKey}"/>

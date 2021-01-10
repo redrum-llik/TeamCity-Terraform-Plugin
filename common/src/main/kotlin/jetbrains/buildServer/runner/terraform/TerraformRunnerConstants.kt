@@ -13,6 +13,7 @@ object TerraformRunnerConstants {
     const val RUNNER_SETTING_PLAN_DO_DESTROY_KEY = "Destroy"
     const val RUNNER_SETTING_APPLY_DO_AUTO_APPROVE = "Auto-approve"
     const val RUNNER_SETTING_APPLY_CUSTOM_BACKUP_KEY = "Custom backup"
+    const val RUNNER_SETTING_EXTRA_ARGS = "Additional arguments"
     const val RUNNER_SETTING_DO_COLOR_KEY = "Enable color"
 
     // detection variables
