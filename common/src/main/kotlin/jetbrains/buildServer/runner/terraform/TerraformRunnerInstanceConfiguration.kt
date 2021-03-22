@@ -1,6 +1,23 @@
 package jetbrains.buildServer.runner.terraform
 
 class TerraformRunnerInstanceConfiguration(private val properties: Map<String, String>) {
+
+    fun getVersionMode(): TerraformVersionMode {
+        return TerraformVersionMode.valueOf(
+                (properties[TerraformRunnerConstants.RUNNER_SETTING_VERSION_KEY]
+                        ?: error("Specified value is not supported for this property")
+                        )
+                        .capitalize()
+        )
+    }
+
+    fun getTFEnvVersion(): String? {
+        if (getVersionMode() != TerraformVersionMode.TFEnv) {
+            throw IllegalAccessError("Attempted to access the version parameter while using different version mode")
+        }
+        return properties[TerraformRunnerConstants.RUNNER_SETTING_VERSION_TFENV_VERSION]
+    }
+
     fun getCommand(): TerraformCommandType {
         return TerraformCommandType.valueOf(
                 (properties[TerraformRunnerConstants.RUNNER_SETTING_COMMAND_KEY]

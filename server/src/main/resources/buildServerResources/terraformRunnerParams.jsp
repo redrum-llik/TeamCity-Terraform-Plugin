@@ -11,6 +11,24 @@
 
 <l:settingsGroup title="Terraform Parameters">
     <tr>
+        <th>Version:</th>
+        <td>
+            <props:selectProperty name="${bean.versionKey}" id="versionSelector" className="shortField" onchange="BS.Terraform.updateVersion()">
+                <props:option value="${bean.versionAuto}">${bean.versionAuto}</props:option>
+                <props:option value="${bean.versionTFEnv}">${bean.versionTFEnv}</props:option>
+            </props:selectProperty>
+            <span class="error" id="error_${bean.versionKey}"></span>
+        </td>
+    </tr>
+    <tr id="tfenv_version">
+        <th><label for="${bean.versionToFetch}">Version to fetch:</label></th>
+        <td>
+            <props:textProperty name="${bean.versionToFetch}" className="longField"/>
+            <bs:vcsTree fieldId="${bean.versionToFetch}"/>
+            <span class="smallNote">Terraform version to be fetched via tfenv</span>
+        </td>
+    </tr>
+    <tr>
         <th>Command:</th>
         <td>
             <props:selectProperty name="${bean.commandKey}" id="commandSelector" className="shortField" onchange="BS.Terraform.updateCommand()">
@@ -95,6 +113,15 @@
             }
             BS.MultilineProperties.updateVisible();
         },
+        updateVersion: function () {
+            var val = $('versionSelector').value;
+            if (val === "${bean.versionAuto}") {
+                BS.Util.hide($("tfenv_version"))
+            }
+            else {
+                BS.Util.show($("tfenv_version"))
+            }
+        },
         showPlanControls: function () {
             BS.Util.show($("plan_custom_output"))
             BS.Util.show($("plan_do_init"))
@@ -115,4 +142,5 @@
         }
     }
     BS.Terraform.updateCommand();
+    BS.Terraform.updateVersion();
 </script>

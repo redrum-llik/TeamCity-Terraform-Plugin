@@ -2,8 +2,14 @@ package jetbrains.buildServer.runner.terraformRunner
 
 import jetbrains.buildServer.runner.terraform.TerraformRunnerConstants as CommonConst
 import jetbrains.buildServer.runner.terraform.TerraformCommandType as CommandType
+import jetbrains.buildServer.runner.terraform.TerraformVersionMode as VersionMode
 
 class TerraformBean {
+    val versionKey: String = CommonConst.RUNNER_SETTING_VERSION_KEY
+    val versionAuto: String = VersionMode.Auto.id
+    val versionTFEnv: String = VersionMode.TFEnv.id
+    val versionToFetch: String = CommonConst.RUNNER_SETTING_VERSION_TFENV_VERSION
+
     val commandKey: String = CommonConst.RUNNER_SETTING_COMMAND_KEY
     val commandInit: String = CommandType.Init.id
     val commandPlan: String = CommandType.Plan.id

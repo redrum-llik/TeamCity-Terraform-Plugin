@@ -45,6 +45,21 @@ class CommandLineBuilder {
         }
     }
 
+    fun getArgumentValue(argName: String): String? {
+        if (arguments.contains(argName)) {
+            val argNamePos = arguments.indexOf(argName)
+            return try {
+                arguments[argNamePos + 1]
+            } catch (e: NullPointerException) {
+                LOG.warn("Could not find argument value for the argument: $argName")
+                null
+            }
+
+        }
+        LOG.debug("There is no such argument added: $argName")
+        return null
+    }
+
     fun setEnvironment(newEnvironment: Map<String, String>) {
         environment.putAll(newEnvironment)
     }
