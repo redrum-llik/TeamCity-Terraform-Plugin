@@ -6,6 +6,32 @@
 <jsp:useBean id="bean" class="jetbrains.buildServer.runner.terraformRunner.TerraformBean"/>
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
 
-<div class="parameter">
-    Lorem ipsum.
-</div>
+<c:if test="${propertiesBean.properties[bean.versionKey] eq bean.versionAuto}">
+    <div class="parameter">
+        Version: <props:displayValue name="Auto-detect" />
+    </div>
+</c:if>
+
+<c:if test="${propertiesBean.properties[bean.versionKey] eq bean.versionTFEnv}">
+    <div class="parameter">
+        Version: <props:displayValue name="${bean.versionToFetch}" />
+    </div>
+</c:if>
+
+<c:if test="${propertiesBean.properties[bean.commandKey] eq bean.commandPlan}">
+    <div class="parameter">
+        Command: <props:displayValue name="plan" />
+    </div>
+</c:if>
+
+<c:if test="${propertiesBean.properties[bean.commandKey] eq bean.commandInit}">
+    <div class="parameter">
+        Command: <props:displayValue name="init" />
+    </div>
+</c:if>
+
+<c:if test="${propertiesBean.properties[bean.commandKey] eq bean.commandApply}">
+    <div class="parameter">
+        Command: <props:displayValue name="apply" />
+    </div>
+</c:if>

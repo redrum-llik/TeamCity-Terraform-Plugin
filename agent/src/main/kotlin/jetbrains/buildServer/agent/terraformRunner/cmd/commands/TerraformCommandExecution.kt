@@ -1,23 +1,38 @@
 package jetbrains.buildServer.agent.terraformRunner.cmd.commands
 
+import com.google.gson.Gson
 import jetbrains.buildServer.agent.BuildRunnerContext
 import jetbrains.buildServer.agent.runner.CommandExecution
 import jetbrains.buildServer.agent.runner.ProgramCommandLine
 import jetbrains.buildServer.agent.runner.TerminationAction
-import jetbrains.buildServer.agent.terraformRunner.TerraformCommandLineConstants
+import jetbrains.buildServer.agent.terraformRunner.TerraformCommandLineConstants as RunnerConst
 import jetbrains.buildServer.agent.terraformRunner.cmd.CommandLineBuilder
 import jetbrains.buildServer.runner.terraform.TerraformRunnerInstanceConfiguration
 
 import java.io.File
+import java.io.FileWriter
+import java.util.*
 
-open class TerraformCommandExecution(
-        val buildRunnerContext: BuildRunnerContext,
-        flowId: String
+abstract class TerraformCommandExecution(
+    val buildRunnerContext: BuildRunnerContext,
+    flowId: String
 ) : CommandExecution {
-    private val myLogger = buildRunnerContext.build.buildLogger.getFlowLogger(flowId)
+    val buildProblemMaxLength = 25
+
+    protected val myLogger = buildRunnerContext.build.buildLogger.getFlowLogger(flowId)
+    private var myHasProblem: Boolean = false
+    var problemText: String = "Terraform command execution failed"
+
+    private fun truncate(string: String): String {
+        if (string.length > buildProblemMaxLength) {
+            return string.substring(0, buildProblemMaxLength - 1) + "..."
+        }
+        return string
+    }
 
     override fun processStarted(programCommandLine: String, workingDirectory: File) {
-        myLogger.message("Starting $programCommandLine, working directory: $workingDirectory")
+        //myLogger.message("Starting $programCommandLine, working directory: $workingDirectory")
+        problemText = "Terraform command '${truncate(programCommandLine)}' failed"
     }
 
     override fun onStandardOutput(text: String) {
@@ -35,9 +50,8 @@ open class TerraformCommandExecution(
     override fun processFinished(exitCode: Int) {
         myLogger.apply {
             if (exitCode != 0) {
+                myHasProblem = true
                 error("Command failed with code $exitCode")
-            } else {
-                message("Command successfully exited with code $exitCode")
             }
         }
     }
@@ -47,25 +61,15 @@ open class TerraformCommandExecution(
     override fun isCommandLineLoggingEnabled(): Boolean = true
 
     protected open fun prepareArguments(
-            config: TerraformRunnerInstanceConfiguration,
-            builder: CommandLineBuilder
+        config: TerraformRunnerInstanceConfiguration,
+        builder: CommandLineBuilder
     ): CommandLineBuilder {
-        return builder
-    }
-
-    private fun prepareCommandArgument(
-            config: TerraformRunnerInstanceConfiguration,
-            builder: CommandLineBuilder
-    ): CommandLineBuilder {
-        val command = config.getCommand().id
-        builder.addArgument(value = command)
-
         return builder
     }
 
     private fun prepareCommonArguments(
-            config: TerraformRunnerInstanceConfiguration,
-            builder: CommandLineBuilder
+        config: TerraformRunnerInstanceConfiguration,
+        builder: CommandLineBuilder
     ): CommandLineBuilder {
         val extraArgs = config.getExtraArgs()
         if (!extraArgs.isNullOrEmpty()) {
@@ -74,19 +78,46 @@ open class TerraformCommandExecution(
 
         val doColor = config.getDoColor()
         if (!doColor) {
-            builder.addArgument(TerraformCommandLineConstants.PARAM_NO_COLOR)
+            builder.addArgument(RunnerConst.PARAM_NO_COLOR)
         }
 
         return builder
+    }
+
+    protected fun prepareConfigurationParametersAsArguments(
+        builder: CommandLineBuilder
+    ): CommandLineBuilder {
+        builder.addArgument(
+            RunnerConst.PARAM_VAR_FILE,
+            saveArgumentsToVarFile()
+        )
+
+        return builder
+    }
+
+    private fun saveArgumentsToVarFile(
+    ): String {
+        val gson = Gson()
+        val varFile = File(
+            buildRunnerContext.build.buildTempDirectory.absolutePath,
+            "terraform_varfile_${UUID.randomUUID()}.json"
+        ).normalize()
+        val writer = FileWriter(varFile)
+        val json = gson.toJson(buildRunnerContext.configParameters)
+        writer.run {
+            write(json)
+            close()
+        }
+
+        return varFile.absolutePath
     }
 
     override fun makeProgramCommandLine(): ProgramCommandLine {
         val builder = CommandLineBuilder()
         val config = TerraformRunnerInstanceConfiguration(buildRunnerContext.runnerParameters)
 
-        builder.executablePath = TerraformCommandLineConstants.COMMAND_TERRAFORM //#FIXME: correct path to executable
+        builder.executablePath = RunnerConst.COMMAND_TERRAFORM //#FIXME: correct path to executable
         builder.workingDir = buildRunnerContext.workingDirectory.path
-        prepareCommandArgument(config, builder)
         prepareArguments(config, builder)
         prepareCommonArguments(config, builder)
 
@@ -94,5 +125,9 @@ open class TerraformCommandExecution(
     }
 
     override fun beforeProcessStarted() {
+    }
+
+    fun hasProblem(): Boolean {
+        return myHasProblem
     }
 }

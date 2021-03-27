@@ -5,25 +5,29 @@ import jetbrains.buildServer.agent.AgentLifeCycleAdapter
 import jetbrains.buildServer.agent.AgentLifeCycleListener
 import jetbrains.buildServer.agent.BuildAgent
 import jetbrains.buildServer.agent.BuildAgentConfiguration
+import jetbrains.buildServer.agent.terraformRunner.detect.TFEnvDetector
 import jetbrains.buildServer.agent.terraformRunner.detect.TerraformDetector
-import jetbrains.buildServer.agent.terraformRunner.detect.TerraformInstance
+import jetbrains.buildServer.agent.terraformRunner.detect.TFExecutableInstance
 import jetbrains.buildServer.runner.terraform.getVersionedPathVarName
 import jetbrains.buildServer.runner.terraform.TerraformRunnerConstants as CommonConst
 import jetbrains.buildServer.util.EventDispatcher
 
 class TerraformAgentInfoProvider(
-    private val myConfig: BuildAgentConfiguration,
-    events: EventDispatcher<AgentLifeCycleListener>,
-    detectors: List<TerraformDetector>
+        private val myConfig: BuildAgentConfiguration,
+        events: EventDispatcher<AgentLifeCycleListener>,
+        tfDetectors: List<TerraformDetector>,
+        tfEnvDetectors: List<TFEnvDetector>
 ) {
-    private val myHolder = TerraformInstanceHolder()
+    private val myTFHolder = TerraformInstanceHolder()
+    private val myTFEnvHolder = TerraformInstanceHolder()
     private val LOG = Logger.getInstance(this.javaClass.name)
 
     init {
         events.addListener(
             object : AgentLifeCycleAdapter() {
                 override fun afterAgentConfigurationLoaded(agent: BuildAgent) {
-                    registerDetectedTerraformInstances(detectors, agent.configuration)
+                    registerDetectedTerraformInstances(tfDetectors, agent.configuration)
+                    registerDetectedTFEnvInstances(tfEnvDetectors, agent.configuration)
                 }
             }
         )
@@ -37,22 +41,44 @@ class TerraformAgentInfoProvider(
             LOG.debug("Detecting Terraform with ${detector.javaClass.name}.")
             for (entry in detector.detectTerraformInstances(configuration!!).entries) {
                 LOG.debug("Processing detected Terraform instance [${entry.key}][${entry.value.version}]")
-                myHolder.addInstance(entry.key, entry.value)
+                myTFHolder.addInstance(entry.key, entry.value)
             }
         }
 
-        if (!myHolder.isEmpty()) {
-            registerMainInstance(myHolder.getMainInstance())
-            registerInstances(myHolder.getInstances())
+        if (!myTFHolder.isEmpty()) {
+            registerMainTFInstance(myTFHolder.getMainInstance())
+            registerTFInstances(myTFHolder.getInstances())
         } else {
             LOG.info(
                 "No Terraform instance detected. If it is not available on PATH, " +
-                        "please provide a custom path with ${CommonConst.BUILD_PARAM_SEARCH_PATH} agent property."
+                        "please provide a custom path with ${CommonConst.BUILD_PARAM_SEARCH_TF_PATH} agent property."
             )
         }
     }
 
-    private fun registerInstances(instances: java.util.HashMap<String, TerraformInstance>) {
+    private fun registerDetectedTFEnvInstances(
+            detectors: List<TFEnvDetector>,
+            configuration: BuildAgentConfiguration?
+    ) {
+        for (detector in detectors) {
+            LOG.debug("Detecting TFEnv with ${detector.javaClass.name}.")
+            for (entry in detector.detectTFEnvInstances(configuration!!).entries) {
+                LOG.debug("Processing detected TFEnv instance [${entry.key}][${entry.value.version}]")
+                myTFEnvHolder.addInstance(entry.key, entry.value)
+            }
+        }
+
+        if (!myTFEnvHolder.isEmpty()) {
+            registerMainTFEnvInstance(myTFEnvHolder.getMainInstance())
+        } else {
+            LOG.info(
+                    "No TFEnv instance detected. If it is not available on PATH, " +
+                            "please provide a custom path with ${CommonConst.BUILD_PARAM_SEARCH_TFENV_PATH} agent property."
+            )
+        }
+    }
+
+    private fun registerTFInstances(instances: java.util.HashMap<String, TFExecutableInstance>) {
         for (instance in instances.values) {
             LOG.info("Registering detected Terraform instance at ${instance.executablePath}")
 
@@ -61,22 +87,29 @@ class TerraformAgentInfoProvider(
         }
     }
 
-    private fun registerMainInstance(mainInstance: TerraformInstance) {
+    private fun registerMainTFInstance(mainInstance: TFExecutableInstance) { //#FIXME no need to save .path if it is equal to agent work dir
         LOG.info("Registering detected Terraform instance at ${mainInstance.executablePath} as main instance")
 
         myConfig.addConfigurationParameter(CommonConst.AGENT_PARAM_TERRAFORM_VERSION, mainInstance.version)
         myConfig.addConfigurationParameter(CommonConst.AGENT_PARAM_TERRAFORM_PATH, mainInstance.executablePath)
     }
 
+    private fun registerMainTFEnvInstance(mainInstance: TFExecutableInstance) {
+        LOG.info("Registering detected TFEnv instance at ${mainInstance.executablePath} as main instance")
+
+        myConfig.addConfigurationParameter(CommonConst.AGENT_PARAM_TFENV_VERSION, mainInstance.version)
+        myConfig.addConfigurationParameter(CommonConst.AGENT_PARAM_TFENV_PATH, mainInstance.executablePath)
+    }
+
     companion object {
         class TerraformInstanceHolder {
-            private val myInstances = HashMap<String, TerraformInstance>()
+            private val myInstances = HashMap<String, TFExecutableInstance>()
 
-            fun addInstance(path: String, terraformInstance: TerraformInstance) {
-                myInstances[path] = terraformInstance
+            fun addInstance(path: String, TFExecutableInstance: TFExecutableInstance) {
+                myInstances[path] = TFExecutableInstance
             }
 
-            fun getInstances(): HashMap<String, TerraformInstance> {
+            fun getInstances(): HashMap<String, TFExecutableInstance> {
                 return myInstances
             }
 
@@ -84,7 +117,7 @@ class TerraformAgentInfoProvider(
                 return myInstances.isEmpty()
             }
 
-            fun getMainInstance(): TerraformInstance {
+            fun getMainInstance(): TFExecutableInstance {
                 return myInstances.values.maxOrNull()!!
             }
         }

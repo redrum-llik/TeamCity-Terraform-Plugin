@@ -6,52 +6,109 @@ import jetbrains.buildServer.agent.BuildRunnerContext
 import jetbrains.buildServer.agent.runner.CommandExecution
 import jetbrains.buildServer.agent.runner.MultiCommandBuildSessionFactory
 import jetbrains.buildServer.agent.terraformRunner.cmd.TerraformBuildService
-import jetbrains.buildServer.agent.terraformRunner.cmd.commands.ApplyCommandExecution
-import jetbrains.buildServer.agent.terraformRunner.cmd.commands.InitCommandExecution
-import jetbrains.buildServer.agent.terraformRunner.cmd.commands.PlanCommandExecution
+import jetbrains.buildServer.agent.terraformRunner.cmd.commands.*
 import jetbrains.buildServer.runner.terraform.TerraformCommandType
 import jetbrains.buildServer.runner.terraform.TerraformRunnerConstants
 import jetbrains.buildServer.runner.terraform.TerraformRunnerInstanceConfiguration
+import jetbrains.buildServer.runner.terraform.TerraformVersionMode
 
 class TerraformRunnerFactory : MultiCommandBuildSessionFactory {
     override fun createSession(runnerContext: BuildRunnerContext): TerraformBuildService {
         val config = TerraformRunnerInstanceConfiguration(runnerContext.runnerParameters)
         return when {
-            config.getCommand() == TerraformCommandType.Apply -> {
+            config.getCommand() == TerraformCommandType.APPLY -> {
                 object : TerraformBuildService(runnerContext) {
-                    override fun instantiateCommands(): List<CommandExecution> {
-                        return arrayListOf(
-                                ApplyCommandExecution(buildRunnerContext, myFlowId)
-                        )
+                    override fun instantiateCommands(): List<TerraformCommandExecution> {
+                        return instantiateApplyCommands(runnerContext, myFlowId)
                     }
                 }
             }
-            config.getCommand() == TerraformCommandType.Init -> {
+            config.getCommand() == TerraformCommandType.INIT -> {
                 object : TerraformBuildService(runnerContext) {
-                    override fun instantiateCommands(): List<CommandExecution> {
-                        return arrayListOf(
-                                InitCommandExecution(buildRunnerContext, myFlowId)
-                        )
+                    override fun instantiateCommands(): List<TerraformCommandExecution> {
+                        return instantiateInitCommands(runnerContext, myFlowId)
                     }
                 }
             }
-            config.getCommand() == TerraformCommandType.Plan -> {
+            config.getCommand() == TerraformCommandType.PLAN -> {
                 object : TerraformBuildService(runnerContext) {
-                    override fun instantiateCommands(): List<CommandExecution> {
-                        if (config.getPlanDoInit()) {
-                            return arrayListOf(
-                                    InitCommandExecution(buildRunnerContext, myFlowId),
-                                    PlanCommandExecution(buildRunnerContext, myFlowId)
-                            )
-                        }
-                        return arrayListOf(
-                                PlanCommandExecution(buildRunnerContext, myFlowId)
-                        )
+                    override fun instantiateCommands(): List<TerraformCommandExecution> {
+                        return instantiatePlanCommands(runnerContext, myFlowId)
                     }
                 }
             }
             else -> throw IllegalStateException("No matching build service found for the specified command")
         }
+    }
+
+    fun instantiateTFEnvCommands(
+            buildRunnerContext: BuildRunnerContext,
+            flowId: String
+    ): ArrayList<TerraformCommandExecution> {
+        val config = TerraformRunnerInstanceConfiguration(buildRunnerContext.runnerParameters)
+        if (config.getVersionMode() == TerraformVersionMode.TFENV) {
+            return arrayListOf(
+                    TFEnvInstallCommandExecution(buildRunnerContext, flowId),
+                    TFEnvUseCommandExecution(buildRunnerContext, flowId)
+            )
+        }
+        return ArrayList()
+    }
+
+    fun instantiateApplyCommands(
+            buildRunnerContext: BuildRunnerContext,
+            flowId: String
+    ): List<TerraformCommandExecution> {
+        val config = TerraformRunnerInstanceConfiguration(buildRunnerContext.runnerParameters)
+        val commands: ArrayList<TerraformCommandExecution> = ArrayList()
+        if (config.getVersionMode() == TerraformVersionMode.TFENV) {
+            commands.addAll(
+                    instantiateTFEnvCommands(buildRunnerContext, flowId)
+            )
+        }
+        commands.add(
+                ApplyCommandExecution(buildRunnerContext, flowId)
+        )
+        return commands
+    }
+
+    fun instantiateInitCommands(
+            buildRunnerContext: BuildRunnerContext,
+            flowId: String
+    ): List<TerraformCommandExecution> {
+        val config = TerraformRunnerInstanceConfiguration(buildRunnerContext.runnerParameters)
+        val commands: ArrayList<TerraformCommandExecution> = ArrayList()
+        if (config.getVersionMode() == TerraformVersionMode.TFENV) {
+            commands.addAll(
+                    instantiateTFEnvCommands(buildRunnerContext, flowId)
+            )
+        }
+        commands.add(
+                InitCommandExecution(buildRunnerContext, flowId)
+        )
+        return commands
+    }
+
+    fun instantiatePlanCommands(
+            buildRunnerContext: BuildRunnerContext,
+            flowId: String
+    ): List<TerraformCommandExecution> {
+        val config = TerraformRunnerInstanceConfiguration(buildRunnerContext.runnerParameters)
+        val commands: ArrayList<TerraformCommandExecution> = ArrayList()
+        if (config.getVersionMode() == TerraformVersionMode.TFENV) {
+            commands.addAll(
+                    instantiateTFEnvCommands(buildRunnerContext, flowId)
+            )
+        }
+        if (config.getPlanDoInit()) {
+            commands.add(
+                    InitCommandExecution(buildRunnerContext, flowId)
+            )
+        }
+        commands.add(
+                PlanCommandExecution(buildRunnerContext, flowId)
+        )
+        return commands
     }
 
     override fun getBuildRunnerInfo(): AgentBuildRunnerInfo {

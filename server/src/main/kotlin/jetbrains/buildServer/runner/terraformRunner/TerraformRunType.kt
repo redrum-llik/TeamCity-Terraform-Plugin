@@ -1,14 +1,16 @@
 package jetbrains.buildServer.runner.terraformRunner
 
 import jetbrains.buildServer.requirements.Requirement
-import jetbrains.buildServer.runner.terraform.TerraformRunnerConstants as CommonConst
+import jetbrains.buildServer.requirements.RequirementType
 import jetbrains.buildServer.runner.terraform.TerraformRunnerInstanceConfiguration
+import jetbrains.buildServer.runner.terraform.TerraformVersionMode
 import jetbrains.buildServer.serverSide.InvalidProperty
 import jetbrains.buildServer.serverSide.PropertiesProcessor
 import jetbrains.buildServer.serverSide.RunType
 import jetbrains.buildServer.serverSide.RunTypeRegistry
 import jetbrains.buildServer.web.openapi.PluginDescriptor
 import java.util.*
+import jetbrains.buildServer.runner.terraform.TerraformRunnerConstants as CommonConst
 
 
 class TerraformRunType(runTypeRegistry: RunTypeRegistry, private val myDescriptor: PluginDescriptor) : RunType() {
@@ -29,8 +31,7 @@ class TerraformRunType(runTypeRegistry: RunTypeRegistry, private val myDescripto
     }
 
     override fun getDefaultRunnerProperties(): MutableMap<String, String> {
-        val map: MutableMap<String, String> = HashMap()
-        return map;
+        return HashMap()
     }
 
     override fun getType(): String {
@@ -47,13 +48,24 @@ class TerraformRunType(runTypeRegistry: RunTypeRegistry, private val myDescripto
 
     override fun getRunnerSpecificRequirements(runParameters: MutableMap<String, String>): MutableList<Requirement> {
         val result: MutableList<Requirement> = ArrayList<Requirement>()
-        //result.add(
-        //   Requirement(
-        //        CommonConst.AGENT_PARAM_ANSIBLE_PATH,
-        //        null,
-        //        RequirementType.EXISTS
-        //    )
-        //)
+        val config = TerraformRunnerInstanceConfiguration(runParameters)
+        when (config.getVersionMode()) {
+            TerraformVersionMode.TFENV -> result.add(
+                Requirement(
+                        CommonConst.AGENT_PARAM_TFENV_PATH,
+                        null,
+                        RequirementType.EXISTS
+                )
+            )
+            TerraformVersionMode.AUTO -> result.add(
+                Requirement(
+                    CommonConst.AGENT_PARAM_TERRAFORM_PATH,
+                    null,
+                    RequirementType.EXISTS
+                )
+            )
+        }
+
         return result
     }
 
@@ -61,10 +73,7 @@ class TerraformRunType(runTypeRegistry: RunTypeRegistry, private val myDescripto
         class ParametersValidator : PropertiesProcessor {
             override fun process(properties: MutableMap<String, String>): MutableCollection<InvalidProperty> {
                 val ret: MutableCollection<InvalidProperty> = ArrayList<InvalidProperty>(1)
-                val config = TerraformRunnerInstanceConfiguration(properties)
-                //if (config.getPlaybook().isNullOrEmpty()) {
-                //    ret.add(InvalidProperty(CommonConst.RUNNER_SETTING_PLAYBOOK_FILE, "Required parameter"))
-                //}
+                //val config = TerraformRunnerInstanceConfiguration(properties)
                 return ret
             }
         }

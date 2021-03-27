@@ -5,5 +5,6 @@
        default-autowire="constructor">
     <bean class="jetbrains.buildServer.agent.terraformRunner.TerraformRunnerFactory"/>
     <bean class="jetbrains.buildServer.agent.terraformRunner.detect.TerraformCommandLineDetector"/>
+    <bean class="jetbrains.buildServer.agent.terraformRunner.detect.TFEnvCommandLineDetector"/>
     <bean class="jetbrains.buildServer.agent.terraformRunner.TerraformAgentInfoProvider"/>
 </beans>

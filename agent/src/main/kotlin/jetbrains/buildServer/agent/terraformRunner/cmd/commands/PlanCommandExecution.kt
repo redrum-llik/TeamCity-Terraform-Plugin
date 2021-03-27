@@ -3,6 +3,7 @@ package jetbrains.buildServer.agent.terraformRunner.cmd.commands
 import jetbrains.buildServer.agent.BuildRunnerContext
 import jetbrains.buildServer.agent.terraformRunner.TerraformCommandLineConstants
 import jetbrains.buildServer.agent.terraformRunner.cmd.CommandLineBuilder
+import jetbrains.buildServer.runner.terraform.TerraformCommandType
 import jetbrains.buildServer.runner.terraform.TerraformRunnerConstants
 import jetbrains.buildServer.runner.terraform.TerraformRunnerInstanceConfiguration
 
@@ -21,6 +22,8 @@ class PlanCommandExecution(
             config: TerraformRunnerInstanceConfiguration,
             builder: CommandLineBuilder
     ): CommandLineBuilder {
+        builder.addArgument(value = TerraformCommandType.PLAN.id)
+
         val customOut = config.getPlanCustomOut()
         if (!customOut.isNullOrEmpty()) {
             builder.addArgument(TerraformCommandLineConstants.PARAM_CUSTOM_OUT, customOut)
@@ -34,6 +37,11 @@ class PlanCommandExecution(
         val outValue = builder.getArgumentValue(TerraformCommandLineConstants.PARAM_CUSTOM_OUT)
         if (!outValue.isNullOrEmpty()) {
             storePlanOutputPath(outValue)
+        }
+
+        val doPassConfigParams = config.getDoPassConfigParams()
+        if (doPassConfigParams) {
+            prepareConfigurationParametersAsArguments(builder)
         }
 
         return builder

@@ -8,7 +8,7 @@ plugins {
 dependencies {
     compile(kotlin("stdlib"))
     compile(project(":common"))
-
+    implementation("com.google.code.gson:gson:2.8.6")
 }
 
 teamcity {

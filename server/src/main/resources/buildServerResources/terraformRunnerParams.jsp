@@ -14,8 +14,8 @@
         <th>Version:</th>
         <td>
             <props:selectProperty name="${bean.versionKey}" id="versionSelector" className="shortField" onchange="BS.Terraform.updateVersion()">
-                <props:option value="${bean.versionAuto}">${bean.versionAuto}</props:option>
-                <props:option value="${bean.versionTFEnv}">${bean.versionTFEnv}</props:option>
+                <props:option value="${bean.versionAuto}">Auto-detect</props:option>
+                <props:option value="${bean.versionTFEnv}">Fetch with tfenv</props:option>
             </props:selectProperty>
             <span class="error" id="error_${bean.versionKey}"></span>
         </td>
@@ -32,9 +32,9 @@
         <th>Command:</th>
         <td>
             <props:selectProperty name="${bean.commandKey}" id="commandSelector" className="shortField" onchange="BS.Terraform.updateCommand()">
-                <props:option value="${bean.commandInit}">${bean.commandInit}</props:option>
-                <props:option value="${bean.commandPlan}">${bean.commandPlan}</props:option>
-                <props:option value="${bean.commandApply}">${bean.commandApply}</props:option>
+                <props:option value="${bean.commandInit}">init</props:option>
+                <props:option value="${bean.commandPlan}">plan</props:option>
+                <props:option value="${bean.commandApply}">apply</props:option>
             </props:selectProperty>
             <span class="error" id="error_${bean.commandKey}"></span>
         </td>
@@ -90,6 +90,13 @@
         <th><label>Enable color:</label></th>
         <td><props:checkboxProperty name="${bean.doColorKey}"/>
             <label for="${bean.doColorKey}">Enable color codes in the command output</label>
+            <br/>
+        </td>
+    </tr>
+    <tr class="advancedSetting" id="do_pass_config_params">
+        <th><label>Pass configuration parameters to command:</label></th>
+        <td><props:checkboxProperty name="${bean.doPassConfigParams}"/>
+            <label for="${bean.doPassConfigParams}">Pass configuration parameters as "-var-file" arguments</label>
             <br/>
         </td>
     </tr>

@@ -4,6 +4,7 @@ object TerraformCommandLineConstants {
     // terraform commands and parameters
 
     const val COMMAND_TERRAFORM = "terraform"
+    const val COMMAND_TFENV = "tfenv"
 
     const val PARAM_VERSION = "-version"
     const val PARAM_CUSTOM_OUT = "-out"
@@ -12,4 +13,7 @@ object TerraformCommandLineConstants {
     const val PARAM_DESTROY = "-destroy"
     const val PARAM_AUTO_APPROVE = "-auto-approve"
     const val PARAM_VAR_FILE = "-var-file"
+
+    const val PARAM_COMMAND_INSTALL = "install"
+    const val PARAM_COMMAND_USE = "use"
 }

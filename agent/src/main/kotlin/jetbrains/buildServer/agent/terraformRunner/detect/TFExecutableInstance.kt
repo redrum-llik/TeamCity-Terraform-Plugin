@@ -1,11 +1,11 @@
 package jetbrains.buildServer.agent.terraformRunner.detect
 
-data class TerraformInstance(
+data class TFExecutableInstance(
     val version: String,
     val executablePath: String,
     val isDefault: Boolean
-) : Comparable<TerraformInstance> {
-    override fun compareTo(other: TerraformInstance): Int {
+) : Comparable<TFExecutableInstance> {
+    override fun compareTo(other: TFExecutableInstance): Int {
         return if (this.isDefault && other.isDefault) {
             versionCompare(this.version, other.version)
         }

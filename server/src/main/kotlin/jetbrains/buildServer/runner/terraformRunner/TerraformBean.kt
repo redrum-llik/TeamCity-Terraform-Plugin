@@ -6,14 +6,14 @@ import jetbrains.buildServer.runner.terraform.TerraformVersionMode as VersionMod
 
 class TerraformBean {
     val versionKey: String = CommonConst.RUNNER_SETTING_VERSION_KEY
-    val versionAuto: String = VersionMode.Auto.id
-    val versionTFEnv: String = VersionMode.TFEnv.id
+    val versionAuto: String = VersionMode.AUTO.toString()
+    val versionTFEnv: String = VersionMode.TFENV.toString()
     val versionToFetch: String = CommonConst.RUNNER_SETTING_VERSION_TFENV_VERSION
 
     val commandKey: String = CommonConst.RUNNER_SETTING_COMMAND_KEY
-    val commandInit: String = CommandType.Init.id
-    val commandPlan: String = CommandType.Plan.id
-    val commandApply: String = CommandType.Apply.id
+    val commandInit: String = CommandType.INIT.toString()
+    val commandPlan: String = CommandType.PLAN.toString()
+    val commandApply: String = CommandType.APPLY.toString()
 
     val planDoDestroyKey: String = CommonConst.RUNNER_SETTING_PLAN_DO_DESTROY_KEY
     val planDoInitKey: String = CommonConst.RUNNER_SETTING_PLAN_DO_INIT_KEY
@@ -24,4 +24,5 @@ class TerraformBean {
 
     val extraArgsKey: String = CommonConst.RUNNER_SETTING_EXTRA_ARGS
     val doColorKey: String = CommonConst.RUNNER_SETTING_DO_COLOR_KEY
+    val doPassConfigParams: String = CommonConst.RUNNER_SETTING_DO_PASS_CONFIG_PARAMS
 }

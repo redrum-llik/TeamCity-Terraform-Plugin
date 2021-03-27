@@ -7,29 +7,27 @@ import com.intellij.execution.process.ProcessOutput
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.util.text.StringUtil
 import jetbrains.buildServer.agent.BuildAgentConfiguration
+import jetbrains.buildServer.agent.terraformRunner.TerraformCommandLineConstants
+import jetbrains.buildServer.runner.terraform.TerraformRunnerConstants
 import java.nio.charset.StandardCharsets
-import java.util.*
-import kotlin.collections.HashMap
-import jetbrains.buildServer.agent.terraformRunner.TerraformCommandLineConstants as RunnerConst
-import jetbrains.buildServer.runner.terraform.TerraformRunnerConstants as CommonConst
+import java.util.ArrayList
 
-
-class TerraformCommandLineDetector : TerraformDetector {
+class TFEnvCommandLineDetector : TFEnvDetector {
     private val LOG = Logger.getInstance(this.javaClass.name)
 
-    override fun detectTerraformInstances(buildAgentConfiguration: BuildAgentConfiguration): MutableMap<String, TFExecutableInstance> {
+    override fun detectTFEnvInstances(buildAgentConfiguration: BuildAgentConfiguration): MutableMap<String, TFExecutableInstance> {
         val instances = HashMap<String, TFExecutableInstance>()
         for (path in getSearchPaths(buildAgentConfiguration)) {
             val output = runDetectionCommand(path)
             if (output != null) {
-                parseTerraformInstance(instances, output, path)
+                parseTFEnvInstances(instances, output, path)
             }
         }
         return instances
     }
 
     private fun getSearchPaths(buildAgentConfiguration: BuildAgentConfiguration): MutableList<SearchPath> {
-        val searchPath = buildAgentConfiguration.configurationParameters[CommonConst.BUILD_PARAM_SEARCH_TF_PATH]
+        val searchPath = buildAgentConfiguration.configurationParameters[TerraformRunnerConstants.BUILD_PARAM_SEARCH_TF_PATH]
         val workDirPath = buildAgentConfiguration.workDirectory.toString()
         val result: MutableList<SearchPath> = ArrayList<SearchPath>()
         if (!searchPath.isNullOrBlank()) {
@@ -41,18 +39,17 @@ class TerraformCommandLineDetector : TerraformDetector {
 
     private fun runDetectionCommand(detectionPath: SearchPath): ProcessOutput? {
         val commandLine = GeneralCommandLine()
-        commandLine.exePath = RunnerConst.COMMAND_TERRAFORM
-        commandLine.addParameter(RunnerConst.PARAM_VERSION)
+        commandLine.exePath = TerraformCommandLineConstants.COMMAND_TFENV
         commandLine.setWorkDirectory(detectionPath.path)
 
-        LOG.debug("Detecting Terraform in: $detectionPath")
+        LOG.debug("Detecting TFEnv in: $detectionPath")
         return handleDetectionProcess(commandLine)
     }
 
     private fun logDetectionProcessOutput(output: ProcessOutput) {
         val stdOut = output.stdout.trim { it <= ' ' }
         val stdErr = output.stderr.trim { it <= ' ' }
-        val b = StringBuilder("Terraform detection command output: \n")
+        val b = StringBuilder("TFEnv detection command output: \n")
         if (!StringUtil.isEmptyOrSpaces(stdOut)) {
             b.append("\n----- stdout: -----\n").append(stdOut).append("\n")
         }
@@ -70,42 +67,41 @@ class TerraformCommandLineDetector : TerraformDetector {
             if (output == null) {
                 return null
             }
-        }
-        catch (e: ProcessNotCreatedException) {
+        } catch (e: ProcessNotCreatedException) {
             return null
         }
         val errorOutput = output.stderr
-        if (!errorOutput.isNullOrEmpty()) {
-            logDetectionProcessOutput(output)
-            return null
+        if (!errorOutput.isNullOrEmpty() && output.exitCode == 1) { //tfenv returns 1 if no command is supplied
+            return output
         }
-        return output
+        logDetectionProcessOutput(output)
+        return null
     }
 
     companion object {
-        private val terraformVersionPattern = "v([0-9.]*)".toRegex()
+        private val terraformVersionPattern = "tfenv ([0-9.]*)".toRegex()
 
         data class SearchPath(
-            val path: String,
-            val isDefault: Boolean = false
+                val path: String,
+                val isDefault: Boolean = false
         )
 
-        fun parseTerraformInstance(
+        fun parseTFEnvInstances(
                 instances: HashMap<String, TFExecutableInstance>,
                 output: ProcessOutput,
                 detectionPath: SearchPath
         ) {
-            val outputLines = output.stdoutLines
+            val outputLines = output.stderrLines //because of non-zero exit code output we are after is stored in stderr
 
             // process version line
             val result = terraformVersionPattern.find(outputLines[0])
-                ?: throw Exception("Could not parse Terraform version.")
-            val version = result.groupValues[0]
+                    ?: throw Exception("Could not parse TFEnv version.")
+            val version = result.groupValues[1]
 
             instances[version] = TFExecutableInstance(
-                version,
-                detectionPath.path,
-                detectionPath.isDefault
+                    version,
+                    detectionPath.path,
+                    detectionPath.isDefault
             )
         }
     }
