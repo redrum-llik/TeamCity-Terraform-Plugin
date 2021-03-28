@@ -17,6 +17,6 @@ For tfenv mode - installed tfenv on the agent side.
 
 ## Implementation details
 
-For the `terraform plan`, the value of `-out` parameter will be preserved as `Terraform_Plan_Output` build configuration parameter which can be reused in the later steps, on the artifact rules or anywhere else.
+For the `terraform plan`, the value of `-out` parameter will be preserved as `terraform.plan.output` build configuration parameter which can be reused in the later steps, on the artifact rules or anywhere else.
 
 The detection logic will look up the ansible-playbook executable in PATH as well as in any folder defined in `teamcity.terraform.detector.search.paths` agent property. All found instances are stored in the configuration variables of the agent (see `terraform.*` variables).
