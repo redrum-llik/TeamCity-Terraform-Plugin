@@ -18,7 +18,7 @@ class TerraformRunnerInstanceConfiguration(private val properties: Map<String, S
 
     fun getCommand(): TerraformCommandType {
         return TerraformCommandType.valueOf(
-                properties[TerraformRunnerConstants.RUNNER_SETTING_COMMAND_KEY]
+                properties[TerraformRunnerConstants.RUNNER_SETTING_COMMAND_KEY]?.toUpperCase()
                         ?: error("Command is not set")
         )
     }

@@ -12,12 +12,16 @@ abstract class TerraformBuildService(
 ) : MultiCommandBuildSession {
     protected val myFlowId: String = FlowGenerator.generateNewFlow()
     private val myCommands: List<TerraformCommandExecution> = this.instantiateCommands()
-    private val myCommandIterator: Iterator<CommandExecution> = myCommands.iterator()
+    private val myCommandIterator: Iterator<TerraformCommandExecution> = myCommands.iterator()
+    private val myCurrentCommand: TerraformCommandExecution? = null
 
     abstract fun instantiateCommands(): List<TerraformCommandExecution>
 
     override fun getNextCommand(): CommandExecution? {
         return when {
+            myCurrentCommand != null && myCurrentCommand.hasProblem() -> {
+                return null
+            }
             myCommandIterator.hasNext() -> {
                 myCommandIterator.next()
             }

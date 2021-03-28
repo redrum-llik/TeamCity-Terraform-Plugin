@@ -96,7 +96,7 @@
     <tr class="advancedSetting" id="do_pass_config_params">
         <th><label>Pass configuration parameters to command:</label></th>
         <td><props:checkboxProperty name="${bean.doPassConfigParams}"/>
-            <label for="${bean.doPassConfigParams}">Pass configuration parameters as "-var-file" arguments</label>
+            <label for="${bean.doPassConfigParams}">Pass TeamCity configuration parameters as "-var-file" argument</label>
             <br/>
         </td>
     </tr>

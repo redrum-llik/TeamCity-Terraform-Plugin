@@ -5,16 +5,11 @@ import jetbrains.buildServer.agent.runner.ProgramCommandLine
 import jetbrains.buildServer.agent.terraformRunner.TerraformCommandLineConstants
 import jetbrains.buildServer.agent.terraformRunner.cmd.CommandLineBuilder
 import jetbrains.buildServer.runner.terraform.TerraformRunnerInstanceConfiguration
-import java.io.File
 
 abstract class TFEnvCommandExecution(
         buildRunnerContext: BuildRunnerContext,
         flowId: String
 ) : TerraformCommandExecution(buildRunnerContext, flowId) {
-    override fun processStarted(programCommandLine: String, workingDirectory: File) {
-        myLogger.message(programCommandLine)
-    }
-
     abstract fun prepareCommandArguments(
             config: TerraformRunnerInstanceConfiguration,
             builder: CommandLineBuilder

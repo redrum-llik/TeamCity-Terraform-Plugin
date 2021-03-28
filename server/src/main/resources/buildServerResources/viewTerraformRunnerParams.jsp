@@ -18,20 +18,6 @@
     </div>
 </c:if>
 
-<c:if test="${propertiesBean.properties[bean.commandKey] eq bean.commandPlan}">
     <div class="parameter">
-        Command: <props:displayValue name="plan" />
+        Command: <props:displayValue name="${propertiesBean.properties[bean.commandKey]}" />
     </div>
-</c:if>
-
-<c:if test="${propertiesBean.properties[bean.commandKey] eq bean.commandInit}">
-    <div class="parameter">
-        Command: <props:displayValue name="init" />
-    </div>
-</c:if>
-
-<c:if test="${propertiesBean.properties[bean.commandKey] eq bean.commandApply}">
-    <div class="parameter">
-        Command: <props:displayValue name="apply" />
-    </div>
-</c:if>

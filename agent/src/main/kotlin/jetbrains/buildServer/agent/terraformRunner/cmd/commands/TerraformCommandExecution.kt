@@ -21,6 +21,7 @@ abstract class TerraformCommandExecution(
 
     protected val myLogger = buildRunnerContext.build.buildLogger.getFlowLogger(flowId)
     private var myHasProblem: Boolean = false
+    private var myCommandLineTruncated: String = ""
     var problemText: String = "Terraform command execution failed"
 
     private fun truncate(string: String): String {
@@ -31,8 +32,9 @@ abstract class TerraformCommandExecution(
     }
 
     override fun processStarted(programCommandLine: String, workingDirectory: File) {
-        //myLogger.message("Starting $programCommandLine, working directory: $workingDirectory")
-        problemText = "Terraform command '${truncate(programCommandLine)}' failed"
+        myCommandLineTruncated = truncate(programCommandLine)
+        myLogger.message("##teamcity[blockOpened name='$myCommandLineTruncated']") //#FIXME looks like shit, might be a better way (push them from buildservice? any class to compose the service messages?)
+        problemText = "Terraform command '$myCommandLineTruncated' failed"
     }
 
     override fun onStandardOutput(text: String) {
@@ -48,6 +50,7 @@ abstract class TerraformCommandExecution(
     }
 
     override fun processFinished(exitCode: Int) {
+        myLogger.message("##teamcity[blockClosed name='$myCommandLineTruncated']")
         myLogger.apply {
             if (exitCode != 0) {
                 myHasProblem = true
@@ -89,13 +92,13 @@ abstract class TerraformCommandExecution(
     ): CommandLineBuilder {
         builder.addArgument(
             RunnerConst.PARAM_VAR_FILE,
-            saveArgumentsToVarFile()
+            saveArgumentsToFile()
         )
 
         return builder
     }
 
-    private fun saveArgumentsToVarFile(
+    private fun saveArgumentsToFile(
     ): String {
         val gson = Gson()
         val varFile = File(
