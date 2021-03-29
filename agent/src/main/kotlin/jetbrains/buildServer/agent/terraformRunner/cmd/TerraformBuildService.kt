@@ -11,6 +11,7 @@ abstract class TerraformBuildService(
         protected val buildRunnerContext: BuildRunnerContext
 ) : MultiCommandBuildSession {
     protected val myFlowId: String = FlowGenerator.generateNewFlow()
+    protected val myLogger = buildRunnerContext.build.buildLogger.getFlowLogger(myFlowId)
     private val myCommands: List<TerraformCommandExecution> = this.instantiateCommands()
     private val myCommandIterator: Iterator<TerraformCommandExecution> = myCommands.iterator()
     private val myCurrentCommand: TerraformCommandExecution? = null
@@ -30,6 +31,7 @@ abstract class TerraformBuildService(
     }
 
     override fun sessionStarted() {
+        myLogger.message("Working directory: ${buildRunnerContext.workingDirectory}")
     }
 
     override fun sessionFinished(): BuildFinishedStatus? {
@@ -39,16 +41,14 @@ abstract class TerraformBuildService(
             return BuildFinishedStatus.FINISHED_SUCCESS
         }
 
-        val logger = buildRunnerContext.build.buildLogger.getFlowLogger(myFlowId)
-
         problemCommands.forEach {
             val buildProblem = it.problemText
-            logger.logBuildProblem(
+            myLogger.logBuildProblem(
                     BuildProblemData.createBuildProblem("Terraform command execution failed", "TerraformExecutionProblem", buildProblem)
             )
         }
 
-        logger.disposeFlow()
+        myLogger.disposeFlow()
 
         return BuildFinishedStatus.FINISHED_WITH_PROBLEMS
     }

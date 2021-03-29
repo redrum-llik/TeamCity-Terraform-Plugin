@@ -34,6 +34,7 @@ abstract class TerraformCommandExecution(
     override fun processStarted(programCommandLine: String, workingDirectory: File) {
         myCommandLineTruncated = truncate(programCommandLine)
         myLogger.message("##teamcity[blockOpened name='$myCommandLineTruncated']") //#FIXME looks like shit, might be a better way (push them from buildservice? any class to compose the service messages?)
+        myLogger.message("Starting: $programCommandLine")
         problemText = "Terraform command '$myCommandLineTruncated' failed"
     }
 
@@ -61,7 +62,7 @@ abstract class TerraformCommandExecution(
 
     override fun interruptRequested(): TerminationAction = TerminationAction.KILL_PROCESS_TREE
 
-    override fun isCommandLineLoggingEnabled(): Boolean = true
+    override fun isCommandLineLoggingEnabled(): Boolean = false
 
     protected open fun prepareArguments(
         config: TerraformRunnerInstanceConfiguration,
