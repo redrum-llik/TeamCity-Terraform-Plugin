@@ -8,6 +8,7 @@ import jetbrains.buildServer.agent.runner.TerminationAction
 import jetbrains.buildServer.agent.terraformRunner.TerraformCommandLineConstants as RunnerConst
 import jetbrains.buildServer.agent.terraformRunner.cmd.CommandLineBuilder
 import jetbrains.buildServer.runner.terraform.TerraformRunnerInstanceConfiguration
+import jetbrains.buildServer.runner.terraform.TerraformRunnerConstants as CommonConst
 
 import java.io.File
 import java.io.FileWriter
@@ -80,15 +81,10 @@ abstract class TerraformCommandExecution(
             builder.addArgument(value = extraArgs)
         }
 
-        val doColor = config.getDoColor()
-        if (!doColor) {
-            builder.addArgument(RunnerConst.PARAM_NO_COLOR)
-        }
-
         return builder
     }
 
-    protected fun prepareConfigurationParametersAsArguments(
+    protected fun preparePrefixedSystemParametersAsArguments(
         builder: CommandLineBuilder
     ): CommandLineBuilder {
         builder.addArgument(
@@ -99,6 +95,15 @@ abstract class TerraformCommandExecution(
         return builder
     }
 
+    protected fun checkTerraformPrefixedSystemParameters(): Boolean {
+        buildRunnerContext.build.sharedBuildParameters.systemProperties.forEach { param ->
+            if (param.key.startsWith(CommonConst.BUILD_PARAM_SYSTEM_TERRAFORM_PREFIX)) {
+                return true
+            }
+        }
+        return false
+    }
+
     private fun saveArgumentsToFile(
     ): String {
         val gson = Gson()
@@ -107,7 +112,11 @@ abstract class TerraformCommandExecution(
             "terraform_varfile_${UUID.randomUUID()}.json"
         ).normalize()
         val writer = FileWriter(varFile)
-        val json = gson.toJson(buildRunnerContext.configParameters)
+        val json = gson.toJson(
+            buildRunnerContext.build.sharedBuildParameters.systemProperties.filterKeys {
+                it.startsWith(CommonConst.BUILD_PARAM_SYSTEM_TERRAFORM_PREFIX)
+            }
+        )
         writer.run {
             write(json)
             close()

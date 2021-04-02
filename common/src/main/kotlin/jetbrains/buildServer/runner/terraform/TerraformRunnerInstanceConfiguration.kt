@@ -23,6 +23,11 @@ class TerraformRunnerInstanceConfiguration(private val properties: Map<String, S
         )
     }
 
+    fun getCustomCommand(): String? {
+        throwIfIncorrectType(TerraformCommandType.CUSTOM)
+        return properties[TerraformRunnerConstants.RUNNER_SETTING_CUSTOM_COMMAND_KEY]
+    }
+
     fun checkType(other: TerraformCommandType): Boolean {
         return getCommand() == other
     }
@@ -35,14 +40,17 @@ class TerraformRunnerInstanceConfiguration(private val properties: Map<String, S
 
     // plan-specific parameters
 
-    fun getPlanDoDestroy(): Boolean {
+    fun getDoInit(): Boolean {
         throwIfIncorrectType(TerraformCommandType.PLAN)
-        return properties[TerraformRunnerConstants.RUNNER_SETTING_PLAN_DO_DESTROY_KEY].toBoolean()
+        return properties[TerraformRunnerConstants.RUNNER_SETTING_INIT_STAGE_DO_INIT_KEY].toBoolean()
     }
 
-    fun getPlanDoInit(): Boolean {
-        throwIfIncorrectType(TerraformCommandType.PLAN)
-        return properties[TerraformRunnerConstants.RUNNER_SETTING_PLAN_DO_INIT_KEY].toBoolean()
+    fun getUseWorkspace(): String? {
+        return properties[TerraformRunnerConstants.RUNNER_SETTING_INIT_STAGE_USE_WORKSPACE_KEY]
+    }
+
+    fun getDoCreateWorkspaceIfNotFound(): Boolean {
+        return properties[TerraformRunnerConstants.RUNNER_SETTING_INIT_STAGE_CREATE_WORKSPACE_IF_NOT_FOUND_KEY].toBoolean()
     }
 
     fun getPlanCustomOut(): String? {
@@ -57,22 +65,9 @@ class TerraformRunnerInstanceConfiguration(private val properties: Map<String, S
         return properties[TerraformRunnerConstants.RUNNER_SETTING_APPLY_CUSTOM_BACKUP_KEY]
     }
 
-    fun getApplyDoAutoApprove(): Boolean {
-        throwIfIncorrectType(TerraformCommandType.APPLY)
-        return properties[TerraformRunnerConstants.RUNNER_SETTING_APPLY_DO_AUTO_APPROVE].toBoolean()
-    }
-
     // common parameters
 
     fun getExtraArgs(): String? {
-        return properties[TerraformRunnerConstants.RUNNER_SETTING_EXTRA_ARGS]
-    }
-
-    fun getDoColor(): Boolean {
-        return properties[TerraformRunnerConstants.RUNNER_SETTING_DO_COLOR_KEY].toBoolean()
-    }
-
-    fun getDoPassConfigParams(): Boolean {
-        return properties[TerraformRunnerConstants.RUNNER_SETTING_DO_PASS_CONFIG_PARAMS].toBoolean()
+        return properties[TerraformRunnerConstants.RUNNER_SETTING_ADDITIONAL_ARGS]
     }
 }

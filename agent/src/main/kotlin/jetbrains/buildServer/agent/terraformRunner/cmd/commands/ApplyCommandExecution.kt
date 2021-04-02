@@ -21,14 +21,10 @@ class ApplyCommandExecution(
             builder.addArgument(TerraformCommandLineConstants.PARAM_CUSTOM_BACKUP_OUT)
         }
 
-        val doAutoApprove = config.getApplyDoAutoApprove()
-        if (doAutoApprove) {
-            builder.addArgument(TerraformCommandLineConstants.PARAM_AUTO_APPROVE)
-        }
+        builder.addArgument(TerraformCommandLineConstants.PARAM_AUTO_APPROVE)
 
-        val doPassConfigParams = config.getDoPassConfigParams()
-        if (doPassConfigParams) {
-            prepareConfigurationParametersAsArguments(builder)
+        if (checkTerraformPrefixedSystemParameters()) {
+            preparePrefixedSystemParametersAsArguments(builder)
         }
 
         return builder

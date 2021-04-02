@@ -29,19 +29,13 @@ class PlanCommandExecution(
             builder.addArgument(TerraformCommandLineConstants.PARAM_CUSTOM_OUT, customOut)
         }
 
-        val doDestroy = config.getPlanDoDestroy()
-        if (doDestroy) {
-            builder.addArgument(TerraformCommandLineConstants.PARAM_DESTROY)
-        }
-
         val outValue = builder.getArgumentValue(TerraformCommandLineConstants.PARAM_CUSTOM_OUT)
         if (!outValue.isNullOrEmpty()) {
             storePlanOutputPath(outValue)
         }
 
-        val doPassConfigParams = config.getDoPassConfigParams()
-        if (doPassConfigParams) {
-            prepareConfigurationParametersAsArguments(builder)
+        if (checkTerraformPrefixedSystemParameters()) {
+            preparePrefixedSystemParametersAsArguments(builder)
         }
 
         return builder

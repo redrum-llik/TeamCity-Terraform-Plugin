@@ -2,6 +2,7 @@ package jetbrains.buildServer.runner.terraformRunner
 
 import jetbrains.buildServer.requirements.Requirement
 import jetbrains.buildServer.requirements.RequirementType
+import jetbrains.buildServer.runner.terraform.TerraformCommandType
 import jetbrains.buildServer.runner.terraform.TerraformRunnerInstanceConfiguration
 import jetbrains.buildServer.runner.terraform.TerraformVersionMode
 import jetbrains.buildServer.serverSide.InvalidProperty
@@ -73,7 +74,12 @@ class TerraformRunType(runTypeRegistry: RunTypeRegistry, private val myDescripto
         class ParametersValidator : PropertiesProcessor {
             override fun process(properties: MutableMap<String, String>): MutableCollection<InvalidProperty> {
                 val ret: MutableCollection<InvalidProperty> = ArrayList<InvalidProperty>(1)
-                //val config = TerraformRunnerInstanceConfiguration(properties)
+                val config = TerraformRunnerInstanceConfiguration(properties)
+
+                if (config.getCommand() == TerraformCommandType.CUSTOM && config.getCustomCommand().isNullOrEmpty()) {
+                    ret.add(InvalidProperty(CommonConst.RUNNER_SETTING_CUSTOM_COMMAND_KEY, "Required parameter"))
+                }
+
                 return ret
             }
         }
