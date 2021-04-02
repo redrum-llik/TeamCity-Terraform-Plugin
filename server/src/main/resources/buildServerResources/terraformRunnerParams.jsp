@@ -133,15 +133,16 @@
             }
         },
         updateWorkspaceControls: function () {
-            var val = $('use_workspace').value;
-            if (val !== null && val !== '') {
-                BS.Util.show($("create_workspace_if_not_found"))
+            var val = $('useWorkspace').value;
+            if (val == null || val.empty()) {
+                BS.Util.hide($("create_workspace_if_not_found"))
             }
             else {
-                BS.Util.hide($("create_workspace_if_not_found"))
+                BS.Util.show($("create_workspace_if_not_found"))
             }
         }
     }
     BS.Terraform.updateCommand();
     BS.Terraform.updateVersion();
+    BS.Terraform.updateWorkspaceControls();
 </script>

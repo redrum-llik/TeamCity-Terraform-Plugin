@@ -65,6 +65,19 @@ abstract class TerraformCommandExecution(
 
     override fun isCommandLineLoggingEnabled(): Boolean = false
 
+    protected open fun getExecutablePath(): String {
+        if (buildRunnerContext.isVirtualContext) {
+            return RunnerConst.COMMAND_TERRAFORM
+        }
+        return File(
+            buildRunnerContext.configParameters.getOrDefault(
+                CommonConst.AGENT_PARAM_TERRAFORM_PATH,
+                ""
+            ),
+            RunnerConst.COMMAND_TERRAFORM
+        ).absolutePath
+    }
+
     protected open fun prepareArguments(
         config: TerraformRunnerInstanceConfiguration,
         builder: CommandLineBuilder
@@ -129,7 +142,7 @@ abstract class TerraformCommandExecution(
         val builder = CommandLineBuilder()
         val config = TerraformRunnerInstanceConfiguration(buildRunnerContext.runnerParameters)
 
-        builder.executablePath = RunnerConst.COMMAND_TERRAFORM //#FIXME: correct path to executable
+        builder.executablePath = getExecutablePath()
         builder.workingDir = buildRunnerContext.workingDirectory.path
         prepareArguments(config, builder)
         prepareCommonArguments(config, builder)

@@ -91,14 +91,18 @@ class TerraformAgentInfoProvider(
         LOG.info("Registering detected Terraform instance at ${mainInstance.executablePath} as main instance")
 
         myConfig.addConfigurationParameter(CommonConst.AGENT_PARAM_TERRAFORM_VERSION, mainInstance.version)
-        myConfig.addConfigurationParameter(CommonConst.AGENT_PARAM_TERRAFORM_PATH, mainInstance.executablePath)
+        if (!mainInstance.isDefault) {
+            myConfig.addConfigurationParameter(CommonConst.AGENT_PARAM_TERRAFORM_PATH, mainInstance.executablePath)
+        }
     }
 
     private fun registerMainTFEnvInstance(mainInstance: TFExecutableInstance) {
         LOG.info("Registering detected TFEnv instance at ${mainInstance.executablePath} as main instance")
 
         myConfig.addConfigurationParameter(CommonConst.AGENT_PARAM_TFENV_VERSION, mainInstance.version)
-        myConfig.addConfigurationParameter(CommonConst.AGENT_PARAM_TFENV_PATH, mainInstance.executablePath)
+        if (!mainInstance.isDefault) {
+            myConfig.addConfigurationParameter(CommonConst.AGENT_PARAM_TFENV_PATH, mainInstance.executablePath)
+        }
     }
 
     companion object {
