@@ -18,6 +18,11 @@ For tfenv mode - installed tfenv on the agent side.
 
 ## Initialization Parameters
 
+**Version**: select the Terraform version choice logic:
+
+* Auto-detect: use the automatically detected version on the agent side;
+* Fetch with tfenv: specify an exact version to be fetched on the agent side, or leave blank for the `tfenv` auto-detection logic.
+
 **Init**: run `terraform init` before execution of the specified command.
 
 **Use workspace**: try to switch to the specified workspace, fail if the workspace was not found.
@@ -25,11 +30,6 @@ For tfenv mode - installed tfenv on the agent side.
 **Create if not found**: if the specified workspace was not found, try to create it instead.
 
 ## Command Parameters
-
-**Version**: select the Terraform version choice logic:
-
-* Auto-detect: use the automatically detected version on the agent side;
-* Fetch with tfenv: specify an exact version to be fetched on the agent side, or leave blank for the `tfenv` auto-detection logic.
 
 **Command**: select the Terraform command:
 
