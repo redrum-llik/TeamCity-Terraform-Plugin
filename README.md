@@ -2,21 +2,62 @@
 
 This project aims to provide a simple Terraform runner for the TeamCity. The key features are:
 
-* wrappers for the popular commands
+* wrappers for the popular commands and initialization stage (init/workspaces logic)
 * automatic detection of Terraform executable on the agent side
-* ability to expose plan binary output path as a build parameter
 * ability to pass configuration parameters via `-var-file`
-* ability to use [tfenv](https://github.com/tfutils/tfenv) to install target version on agent side, optionally to read it from .terraform-version file
+* ability to use [tfenv](https://github.com/tfutils/tfenv) to install/switch to the target version on agent side
 
-The features which are planned:
-* workspace logic handler
+Example of the build log:
+![image](https://user-images.githubusercontent.com/63649969/113509602-27608200-955f-11eb-8438-feb62088e10a.png)
 
 ## Requirements
 For auto-detection mode - installed Terraform on the agent side.
-For tfenv mode - installed tfenv on the agent side. 
+For tfenv mode - installed tfenv on the agent side.
 
-## Implementation details
+# Configuration
+
+## Initialization Parameters
+
+**Init**: run `terraform init` before execution of the specified command.
+
+**Use workspace**: try to switch to the specified workspace, fail if the workspace was not found.
+
+**Create if not found**: if the specified workspace was not found, try to create it instead.
+
+## Command Parameters
+
+**Version**: select the Terraform version choice logic:
+
+* Auto-detect: use the automatically detected version on the agent side;
+* Fetch with tfenv: specify an exact version to be fetched on the agent side, or leave blank for the `tfenv` auto-detection logic.
+
+**Command**: select the Terraform command:
+
+* plan: invoke `terraform plan`, allows to specify custom path for the plan output.
+* apply: invoke `terraform apply`, allows to specify custom path to the state backup file (produced by plan).
+* Custom: specify your own command for the execution.
+
+**Additional arguments**: any extra arguments to be passed to the command.
+
+## Docker Settings
+
+See the relevant information on the [Docker Wrapper](https://www.jetbrains.com/help/teamcity/docker-wrapper.html) documentation page.
+
+# Implementation details
+
+## Plan output
 
 For the `terraform plan`, the value of `-out` parameter will be preserved as `terraform.plan.output` build configuration parameter which can be reused in the later steps, on the artifact rules or anywhere else.
 
-The detection logic will look up the ansible-playbook executable in PATH as well as in any folder defined in `teamcity.terraform.detector.search.paths` agent property. All found instances are stored in the configuration variables of the agent (see `terraform.*` variables).
+## Terraform detection
+
+The detection logic will look up the `terraform` executable in PATH as well as in any folder defined in `teamcity.terraform.detector.search.path` agent property. All found instances are stored in the configuration variables of the agent (see `terraform.*` variables).
+
+Runner will impose the following [agent requirements](https://www.jetbrains.com/help/teamcity/agent-requirements.html) (depending on the version choise logic described above):
+
+* `terraform.version` exists
+* `tfenv.version` exists
+
+## Prefixed parameters
+
+Any system build parameter which starts with `system.terraform.` prefix will be exported into a temporary JSON file which will be supplied as `-var-file` value which should allow to easily pass TeamCity parameters into the playbook context, even if it is defined in the file. 
