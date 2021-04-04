@@ -21,8 +21,8 @@ abstract class TerraformCommandExecution(
     val buildProblemMaxLength = 25
 
     protected val myLogger = buildRunnerContext.build.buildLogger.getFlowLogger(flowId)
-    private var myHasProblem: Boolean = false
-    private var myCommandLineTruncated: String = ""
+    protected var myHasProblem: Boolean = false
+    protected var myCommandLineTruncated: String = ""
     var problemText: String = "Terraform command execution failed"
 
     private fun truncate(string: String): String {

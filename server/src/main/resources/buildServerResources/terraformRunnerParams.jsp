@@ -14,7 +14,25 @@
 
 <forms:workingDirectory/>
 
-<l:settingsGroup title="Initialization Parameters" className="advancedSetting">
+<l:settingsGroup title="Initialization Parameters">
+    <tr>
+        <th>${versionBean.label}</th>
+        <td>
+            <props:selectProperty name="${versionBean.key}" id="versionSelector" className="shortField" onchange="BS.Terraform.updateVersion()">
+                <props:option value="${versionBean.autoDetectModeKey}">${versionBean.autoDetectModeValue}</props:option>
+                <props:option value="${versionBean.tfEnvModeKey}">${versionBean.tfEnvModeValue}</props:option>
+            </props:selectProperty>
+            <span class="error" id="error_${versionBean.key}"></span>
+        </td>
+    </tr>
+    <tr id="tfenv_version">
+        <th><label for="${versionBean.tfEnvKey}">${versionBean.tfEnvLabel}</label></th>
+        <td>
+            <props:textProperty name="${versionBean.tfEnvKey}" className="longField"/>
+            <bs:vcsTree fieldId="${versionBean.tfEnvKey}"/>
+            <span class="smallNote">${versionBean.tfEnvDescription}</span>
+        </td>
+    </tr>
     <tr class="advancedSetting" id="do_init">
         <th><label>${initStageBean.doInitLabel}</label></th>
         <td><props:checkboxProperty name="${initStageBean.doInitKey}"/>
@@ -40,24 +58,6 @@
 </l:settingsGroup>
 
 <l:settingsGroup title="Command Parameters">
-    <tr>
-        <th>${versionBean.label}</th>
-        <td>
-            <props:selectProperty name="${versionBean.key}" id="versionSelector" className="shortField" onchange="BS.Terraform.updateVersion()">
-                <props:option value="${versionBean.autoDetectModeKey}">${versionBean.autoDetectModeValue}</props:option>
-                <props:option value="${versionBean.tfEnvModeKey}">${versionBean.tfEnvModeValue}</props:option>
-            </props:selectProperty>
-            <span class="error" id="error_${versionBean.key}"></span>
-        </td>
-    </tr>
-    <tr id="tfenv_version">
-        <th><label for="${versionBean.tfEnvKey}">${versionBean.tfEnvLabel}</label></th>
-        <td>
-            <props:textProperty name="${versionBean.tfEnvKey}" className="longField"/>
-            <bs:vcsTree fieldId="${versionBean.tfEnvKey}"/>
-            <span class="smallNote">${versionBean.tfEnvDescription}</span>
-        </td>
-    </tr>
     <tr>
         <th>${commandBean.label}</th>
         <td>

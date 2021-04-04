@@ -1,4 +1,4 @@
-package jetbrains.buildServer.agent.terraformRunner.cmd.commands
+package jetbrains.buildServer.agent.terraformRunner.cmd.commands.tfenv
 
 import jetbrains.buildServer.agent.BuildRunnerContext
 import jetbrains.buildServer.agent.terraformRunner.TerraformCommandLineConstants
