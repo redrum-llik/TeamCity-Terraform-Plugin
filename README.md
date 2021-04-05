@@ -47,7 +47,13 @@ See the relevant information on the [Docker Wrapper](https://www.jetbrains.com/h
 
 ## Plan output
 
-For the `terraform plan`, the value of `-out` parameter will be preserved as `terraform.plan.output` build configuration parameter which can be reused in the later steps, on the artifact rules or anywhere else.
+For the `terraform plan`, this runner will always append `-out`  argument unless one is already available. The output file path is defined as following:
+
+* if custom output path is specified, use it (either in dedicated field or in `Additional arguments` field)
+* else, if workspace name is defined, use `<working directory>/terraform_plan_<workspace name>.out`
+* else, use `<working directory>/terraform_plan.out`
+
+The runner will [automatically publish the output file](https://www.jetbrains.com/help/teamcity/service-messages.html#Publishing+Artifacts+while+the+Build+is+Still+in+Progress) as an artifact.
 
 ## Terraform detection
 
