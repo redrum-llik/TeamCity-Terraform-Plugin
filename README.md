@@ -60,4 +60,4 @@ Runner will impose the following [agent requirements](https://www.jetbrains.com/
 
 ## Prefixed parameters
 
-Any system build parameter which starts with `system.terraform.` prefix will be exported into a temporary JSON file which will be supplied as `-var-file` value which should allow to easily pass TeamCity parameters into the playbook context, even if it is defined in the file. 
+Any system build parameter which starts with `system.terraform.` prefix will be exported into a temporary JSON file which will be supplied as `-var-file` value which should allow to easily pass TeamCity parameters into the execution context. 
