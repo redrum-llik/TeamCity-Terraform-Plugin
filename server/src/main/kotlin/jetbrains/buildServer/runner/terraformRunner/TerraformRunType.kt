@@ -53,14 +53,14 @@ class TerraformRunType(runTypeRegistry: RunTypeRegistry, private val myDescripto
         when (config.getVersionMode()) {
             TerraformVersionMode.TFENV -> result.add(
                 Requirement(
-                        CommonConst.AGENT_PARAM_TFENV_PATH,
+                        CommonConst.AGENT_PARAM_TFENV_VERSION,
                         null,
                         RequirementType.EXISTS
                 )
             )
             TerraformVersionMode.AUTO -> result.add(
                 Requirement(
-                    CommonConst.AGENT_PARAM_TERRAFORM_PATH,
+                    CommonConst.AGENT_PARAM_TERRAFORM_VERSION,
                     null,
                     RequirementType.EXISTS
                 )
