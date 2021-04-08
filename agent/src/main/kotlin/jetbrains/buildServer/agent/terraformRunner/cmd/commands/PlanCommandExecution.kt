@@ -10,7 +10,7 @@ import java.io.File
 class PlanCommandExecution(
     buildRunnerContext: BuildRunnerContext,
     flowId: String
-) : TerraformCommandExecution(buildRunnerContext, flowId) {
+) : BaseCommandExecution(buildRunnerContext, flowId) {
     private val outPattern = "-out\\s(\\S*)\\s".toRegex()
     private val customOut = getPlanOutputPath()
 
@@ -41,8 +41,11 @@ class PlanCommandExecution(
     }
 
     private fun publishPlanOutput(path: String) {
-        val baseFile = buildRunnerContext.workingDirectory
-        val relativePath = File(path).relativeTo(baseFile)
+        val basePath = buildRunnerContext.build.checkoutDirectory
+        val relativePath = File(
+            buildRunnerContext.workingDirectory,
+            path
+        ).relativeTo(basePath).path
         val rule = "+:$relativePath"
         myLogger.message("Publishing 'terraform plan' output with the following rule: '$rule'")
         myLogger.message("##teamcity[publishArtifacts '$rule']") //#FIXME see other service messages

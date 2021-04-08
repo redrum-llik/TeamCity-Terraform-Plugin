@@ -5,18 +5,18 @@ import jetbrains.buildServer.agent.BuildFinishedStatus
 import jetbrains.buildServer.agent.BuildRunnerContext
 import jetbrains.buildServer.agent.FlowGenerator
 import jetbrains.buildServer.agent.runner.*
-import jetbrains.buildServer.agent.terraformRunner.cmd.commands.TerraformCommandExecution
+import jetbrains.buildServer.agent.terraformRunner.cmd.commands.BaseCommandExecution
 
 abstract class TerraformBuildService(
         protected val buildRunnerContext: BuildRunnerContext
 ) : MultiCommandBuildSession {
     protected val myFlowId: String = FlowGenerator.generateNewFlow()
     protected val myLogger = buildRunnerContext.build.buildLogger.getFlowLogger(myFlowId)
-    private val myCommands: List<TerraformCommandExecution> = this.instantiateCommands()
-    private val myCommandIterator: Iterator<TerraformCommandExecution> = myCommands.iterator()
-    private val myCurrentCommand: TerraformCommandExecution? = null
+    private val myCommands: List<BaseCommandExecution> = this.instantiateCommands()
+    private val myCommandIterator: Iterator<BaseCommandExecution> = myCommands.iterator()
+    private val myCurrentCommand: BaseCommandExecution? = null
 
-    abstract fun instantiateCommands(): List<TerraformCommandExecution>
+    abstract fun instantiateCommands(): List<BaseCommandExecution>
 
     override fun getNextCommand(): CommandExecution? {
         return when {
@@ -35,7 +35,7 @@ abstract class TerraformBuildService(
     }
 
     override fun sessionFinished(): BuildFinishedStatus? {
-        val problemCommands : List<TerraformCommandExecution> = myCommands.filter { it.hasProblem() }
+        val problemCommands : List<BaseCommandExecution> = myCommands.filter { it.hasProblem() }
 
         if (!myCommandIterator.hasNext() && problemCommands.isEmpty()) {
             return BuildFinishedStatus.FINISHED_SUCCESS

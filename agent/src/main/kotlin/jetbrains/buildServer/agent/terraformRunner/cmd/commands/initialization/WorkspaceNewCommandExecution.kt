@@ -1,21 +1,24 @@
-package jetbrains.buildServer.agent.terraformRunner.cmd.commands.workspace
+package jetbrains.buildServer.agent.terraformRunner.cmd.commands.initialization
 
 import jetbrains.buildServer.agent.BuildRunnerContext
+import jetbrains.buildServer.agent.terraformRunner.TerraformCommandLineConstants
 import jetbrains.buildServer.agent.terraformRunner.cmd.CommandLineBuilder
-import jetbrains.buildServer.agent.terraformRunner.cmd.commands.TerraformCommandExecution
 import jetbrains.buildServer.runner.terraform.TerraformCommandType
 import jetbrains.buildServer.runner.terraform.TerraformRunnerInstanceConfiguration
 
-class WorkspaceSelectCommandExecution(
+class WorkspaceNewCommandExecution(
     buildRunnerContext: BuildRunnerContext,
     flowId: String,
     private val workspaceName: String
-) : TerraformCommandExecution(buildRunnerContext, flowId) {
+) : BaseInitializationCommandExecution(buildRunnerContext, flowId) {
+    val pattern = "Workspace \".*\" already exists".toRegex()
+
     override fun prepareArguments(
         config: TerraformRunnerInstanceConfiguration,
         builder: CommandLineBuilder
     ): CommandLineBuilder {
-        builder.addArgument(value = TerraformCommandType.WORKSPACE_SELECT.id)
+        builder.addArgument(argName = TerraformCommandType.WORKSPACE.id)
+        builder.addArgument(argName = TerraformCommandLineConstants.PARAM_COMMAND_NEW)
         builder.addArgument(value = workspaceName)
         return builder
     }
@@ -25,7 +28,8 @@ class WorkspaceSelectCommandExecution(
         val config = TerraformRunnerInstanceConfiguration(buildRunnerContext.runnerParameters)
         myLogger.apply {
             if (exitCode != 0) {
-                if (!config.getDoCreateWorkspaceIfNotFound()) {
+                val result = findInErrorOutput(pattern)
+                if (result == null) {
                     myHasProblem = true
                     error("Command failed with code $exitCode")
                 }

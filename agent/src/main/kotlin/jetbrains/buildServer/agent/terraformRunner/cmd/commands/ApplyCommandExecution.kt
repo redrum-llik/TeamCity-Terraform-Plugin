@@ -9,7 +9,7 @@ import jetbrains.buildServer.runner.terraform.TerraformRunnerInstanceConfigurati
 class ApplyCommandExecution(
         buildRunnerContext: BuildRunnerContext,
         flowId: String
-) : TerraformCommandExecution(buildRunnerContext, flowId) {
+) : BaseCommandExecution(buildRunnerContext, flowId) {
     override fun prepareArguments(
             config: TerraformRunnerInstanceConfiguration,
             builder: CommandLineBuilder

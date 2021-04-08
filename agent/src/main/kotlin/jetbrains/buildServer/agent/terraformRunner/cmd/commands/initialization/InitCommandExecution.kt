@@ -1,22 +1,19 @@
-package jetbrains.buildServer.agent.terraformRunner.cmd.commands.workspace
+package jetbrains.buildServer.agent.terraformRunner.cmd.commands.initialization
 
 import jetbrains.buildServer.agent.BuildRunnerContext
 import jetbrains.buildServer.agent.terraformRunner.cmd.CommandLineBuilder
-import jetbrains.buildServer.agent.terraformRunner.cmd.commands.TerraformCommandExecution
 import jetbrains.buildServer.runner.terraform.TerraformCommandType
 import jetbrains.buildServer.runner.terraform.TerraformRunnerInstanceConfiguration
 
-class WorkspaceNewCommandExecution(
+class InitCommandExecution(
     buildRunnerContext: BuildRunnerContext,
-    flowId: String,
-    private val workspaceName: String
-) : TerraformCommandExecution(buildRunnerContext, flowId) {
+    flowId: String
+) : BaseInitializationCommandExecution(buildRunnerContext, flowId) {
     override fun prepareArguments(
         config: TerraformRunnerInstanceConfiguration,
         builder: CommandLineBuilder
     ): CommandLineBuilder {
-        builder.addArgument(value = TerraformCommandType.WORKSPACE_NEW.id)
-        builder.addArgument(value = workspaceName)
+        builder.addArgument(argName = TerraformCommandType.INIT.id)
         return builder
     }
 }

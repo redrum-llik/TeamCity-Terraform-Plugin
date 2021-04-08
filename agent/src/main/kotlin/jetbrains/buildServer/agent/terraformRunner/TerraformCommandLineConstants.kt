@@ -16,4 +16,7 @@ object TerraformCommandLineConstants {
 
     const val PARAM_COMMAND_INSTALL = "install"
     const val PARAM_COMMAND_USE = "use"
+
+    const val PARAM_COMMAND_SELECT = "select"
+    const val PARAM_COMMAND_NEW = "new"
 }

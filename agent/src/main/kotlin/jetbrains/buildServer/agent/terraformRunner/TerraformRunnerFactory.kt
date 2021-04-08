@@ -6,10 +6,11 @@ import jetbrains.buildServer.agent.BuildRunnerContext
 import jetbrains.buildServer.agent.runner.MultiCommandBuildSessionFactory
 import jetbrains.buildServer.agent.terraformRunner.cmd.TerraformBuildService
 import jetbrains.buildServer.agent.terraformRunner.cmd.commands.*
+import jetbrains.buildServer.agent.terraformRunner.cmd.commands.initialization.InitCommandExecution
 import jetbrains.buildServer.agent.terraformRunner.cmd.commands.tfenv.TFEnvInstallCommandExecution
 import jetbrains.buildServer.agent.terraformRunner.cmd.commands.tfenv.TFEnvUseCommandExecution
-import jetbrains.buildServer.agent.terraformRunner.cmd.commands.workspace.WorkspaceNewCommandExecution
-import jetbrains.buildServer.agent.terraformRunner.cmd.commands.workspace.WorkspaceSelectCommandExecution
+import jetbrains.buildServer.agent.terraformRunner.cmd.commands.initialization.WorkspaceNewCommandExecution
+import jetbrains.buildServer.agent.terraformRunner.cmd.commands.initialization.WorkspaceSelectCommandExecution
 import jetbrains.buildServer.runner.terraform.TerraformCommandType
 import jetbrains.buildServer.runner.terraform.TerraformRunnerConstants
 import jetbrains.buildServer.runner.terraform.TerraformRunnerInstanceConfiguration
@@ -21,21 +22,21 @@ class TerraformRunnerFactory : MultiCommandBuildSessionFactory {
         return when {
             config.getCommand() == TerraformCommandType.APPLY -> {
                 object : TerraformBuildService(runnerContext) {
-                    override fun instantiateCommands(): List<TerraformCommandExecution> {
+                    override fun instantiateCommands(): List<BaseCommandExecution> {
                         return instantiateApplyCommands(runnerContext, myFlowId)
                     }
                 }
             }
             config.getCommand() == TerraformCommandType.PLAN -> {
                 object : TerraformBuildService(runnerContext) {
-                    override fun instantiateCommands(): List<TerraformCommandExecution> {
+                    override fun instantiateCommands(): List<BaseCommandExecution> {
                         return instantiatePlanCommands(runnerContext, myFlowId)
                     }
                 }
             }
             config.getCommand() == TerraformCommandType.CUSTOM -> {
                 object : TerraformBuildService(runnerContext) {
-                    override fun instantiateCommands(): List<TerraformCommandExecution> {
+                    override fun instantiateCommands(): List<BaseCommandExecution> {
                         return instantiateCustomCommands(runnerContext, myFlowId)
                     }
                 }
@@ -47,7 +48,7 @@ class TerraformRunnerFactory : MultiCommandBuildSessionFactory {
     private fun instantiateTFEnvCommands(
         buildRunnerContext: BuildRunnerContext,
         flowId: String
-    ): ArrayList<TerraformCommandExecution> {
+    ): ArrayList<BaseCommandExecution> {
         val config = TerraformRunnerInstanceConfiguration(buildRunnerContext.runnerParameters)
         if (config.getVersionMode() == TerraformVersionMode.TFENV) {
             return arrayListOf(
@@ -61,8 +62,8 @@ class TerraformRunnerFactory : MultiCommandBuildSessionFactory {
     private fun instantiateInitStageCommands(
         buildRunnerContext: BuildRunnerContext,
         flowId: String
-    ): ArrayList<TerraformCommandExecution> {
-        val commands: ArrayList<TerraformCommandExecution> = ArrayList()
+    ): ArrayList<BaseCommandExecution> {
+        val commands: ArrayList<BaseCommandExecution> = ArrayList()
         val config = TerraformRunnerInstanceConfiguration(buildRunnerContext.runnerParameters)
         val workspaceName = config.getUseWorkspace()!!
 
@@ -87,7 +88,7 @@ class TerraformRunnerFactory : MultiCommandBuildSessionFactory {
 
         if (config.getDoInit()) {
             commands.add(
-                CustomCommandExecution(buildRunnerContext, flowId, TerraformCommandType.INIT.name)
+                InitCommandExecution(buildRunnerContext, flowId)
             )
         }
 
@@ -98,9 +99,9 @@ class TerraformRunnerFactory : MultiCommandBuildSessionFactory {
     fun instantiateCustomCommands(
         buildRunnerContext: BuildRunnerContext,
         flowId: String
-    ): List<TerraformCommandExecution> {
+    ): List<BaseCommandExecution> {
         val config = TerraformRunnerInstanceConfiguration(buildRunnerContext.runnerParameters)
-        val commands: ArrayList<TerraformCommandExecution> = ArrayList()
+        val commands: ArrayList<BaseCommandExecution> = ArrayList()
         commands.addAll(instantiateInitStageCommands(buildRunnerContext, flowId))
         commands.add(
             CustomCommandExecution(buildRunnerContext, flowId, config.getCustomCommand()!!)
@@ -111,8 +112,8 @@ class TerraformRunnerFactory : MultiCommandBuildSessionFactory {
     fun instantiateApplyCommands(
         buildRunnerContext: BuildRunnerContext,
         flowId: String
-    ): List<TerraformCommandExecution> {
-        val commands: ArrayList<TerraformCommandExecution> = ArrayList()
+    ): List<BaseCommandExecution> {
+        val commands: ArrayList<BaseCommandExecution> = ArrayList()
         commands.addAll(instantiateInitStageCommands(buildRunnerContext, flowId))
         commands.add(
             ApplyCommandExecution(buildRunnerContext, flowId)
@@ -123,8 +124,8 @@ class TerraformRunnerFactory : MultiCommandBuildSessionFactory {
     fun instantiatePlanCommands(
         buildRunnerContext: BuildRunnerContext,
         flowId: String
-    ): List<TerraformCommandExecution> {
-        val commands: ArrayList<TerraformCommandExecution> = ArrayList()
+    ): List<BaseCommandExecution> {
+        val commands: ArrayList<BaseCommandExecution> = ArrayList()
         commands.addAll(instantiateInitStageCommands(buildRunnerContext, flowId))
         commands.add(
             PlanCommandExecution(buildRunnerContext, flowId)

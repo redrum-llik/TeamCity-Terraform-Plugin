@@ -4,15 +4,15 @@ import jetbrains.buildServer.agent.BuildRunnerContext
 import jetbrains.buildServer.agent.runner.ProgramCommandLine
 import jetbrains.buildServer.agent.terraformRunner.TerraformCommandLineConstants
 import jetbrains.buildServer.agent.terraformRunner.cmd.CommandLineBuilder
-import jetbrains.buildServer.agent.terraformRunner.cmd.commands.TerraformCommandExecution
+import jetbrains.buildServer.agent.terraformRunner.cmd.commands.BaseCommandExecution
 import jetbrains.buildServer.runner.terraform.TerraformRunnerConstants
 import jetbrains.buildServer.runner.terraform.TerraformRunnerInstanceConfiguration
 import java.io.File
 
-abstract class TFEnvCommandExecution(
+abstract class BaseTFEnvCommandExecution(
         buildRunnerContext: BuildRunnerContext,
         flowId: String
-) : TerraformCommandExecution(buildRunnerContext, flowId) {
+) : BaseCommandExecution(buildRunnerContext, flowId) {
     override fun getExecutablePath(): String {
         if (buildRunnerContext.isVirtualContext) {
             return TerraformCommandLineConstants.COMMAND_TFENV

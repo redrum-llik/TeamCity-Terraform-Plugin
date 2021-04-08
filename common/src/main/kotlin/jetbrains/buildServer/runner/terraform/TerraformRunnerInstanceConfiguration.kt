@@ -41,7 +41,6 @@ class TerraformRunnerInstanceConfiguration(private val properties: Map<String, S
     // plan-specific parameters
 
     fun getDoInit(): Boolean {
-        throwIfIncorrectType(TerraformCommandType.PLAN)
         return properties[TerraformRunnerConstants.RUNNER_SETTING_INIT_STAGE_DO_INIT_KEY].toBoolean()
     }
 

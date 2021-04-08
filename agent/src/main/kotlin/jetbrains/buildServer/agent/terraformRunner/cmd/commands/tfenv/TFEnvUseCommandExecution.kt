@@ -8,7 +8,7 @@ import jetbrains.buildServer.runner.terraform.TerraformRunnerInstanceConfigurati
 class TFEnvUseCommandExecution(
         buildRunnerContext: BuildRunnerContext,
         flowId: String
-) : TFEnvCommandExecution(buildRunnerContext, flowId) {
+) : BaseTFEnvCommandExecution(buildRunnerContext, flowId) {
     override fun prepareCommandArguments(
             config: TerraformRunnerInstanceConfiguration,
             builder: CommandLineBuilder

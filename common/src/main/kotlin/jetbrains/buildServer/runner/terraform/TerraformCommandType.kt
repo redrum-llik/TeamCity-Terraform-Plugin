@@ -5,8 +5,7 @@ enum class TerraformCommandType(val id: String) {
     INIT("init"),
     PLAN("plan"),
     APPLY("apply"),
-    WORKSPACE_SELECT("workspace select"),
-    WORKSPACE_NEW("workspace new");
+    WORKSPACE("workspace");
 
     companion object {
         @JvmStatic

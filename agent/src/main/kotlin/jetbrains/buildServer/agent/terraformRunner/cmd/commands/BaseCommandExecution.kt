@@ -14,7 +14,7 @@ import java.io.File
 import java.io.FileWriter
 import java.util.*
 
-abstract class TerraformCommandExecution(
+abstract class BaseCommandExecution(
     val buildRunnerContext: BuildRunnerContext,
     flowId: String
 ) : CommandExecution {
@@ -66,14 +66,17 @@ abstract class TerraformCommandExecution(
     override fun isCommandLineLoggingEnabled(): Boolean = false
 
     protected open fun getExecutablePath(): String {
-        if (buildRunnerContext.isVirtualContext) {
+        if (
+            buildRunnerContext.isVirtualContext ||
+            !buildRunnerContext.configParameters.containsKey(
+                CommonConst.AGENT_PARAM_TERRAFORM_PATH
+            )
+        ) {
             return RunnerConst.COMMAND_TERRAFORM
         }
+
         return File(
-            buildRunnerContext.configParameters.getOrDefault(
-                CommonConst.AGENT_PARAM_TERRAFORM_PATH,
-                ""
-            ),
+            buildRunnerContext.configParameters[CommonConst.AGENT_PARAM_TERRAFORM_PATH],
             RunnerConst.COMMAND_TERRAFORM
         ).absolutePath
     }
@@ -85,7 +88,7 @@ abstract class TerraformCommandExecution(
         return builder
     }
 
-    private fun prepareCommonArguments(
+    protected open fun prepareCommonArguments(
         config: TerraformRunnerInstanceConfiguration,
         builder: CommandLineBuilder
     ): CommandLineBuilder {
