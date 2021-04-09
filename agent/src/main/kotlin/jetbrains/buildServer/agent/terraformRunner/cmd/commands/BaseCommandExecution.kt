@@ -22,21 +22,12 @@ abstract class BaseCommandExecution(
 
     protected val myLogger = buildRunnerContext.build.buildLogger.getFlowLogger(flowId)
     protected var myHasProblem: Boolean = false
-    protected var myCommandLineTruncated: String = ""
-    var problemText: String = "Terraform command execution failed"
 
-    private fun truncate(string: String): String {
-        if (string.length > buildProblemMaxLength) {
-            return string.substring(0, buildProblemMaxLength - 1) + "..."
-        }
-        return string
-    }
+    abstract fun describe(): String
 
     override fun processStarted(programCommandLine: String, workingDirectory: File) {
-        myCommandLineTruncated = truncate(programCommandLine)
-        myLogger.message("##teamcity[blockOpened name='$myCommandLineTruncated']") //#FIXME looks like shit, might be a better way (push them from buildservice? any class to compose the service messages?)
+        myLogger.message("##teamcity[blockOpened name='${describe()}']") //#FIXME might be a better way (push them from buildservice? any class to compose the service messages?)
         myLogger.message("Starting: $programCommandLine")
-        problemText = "Terraform command '$myCommandLineTruncated' failed"
     }
 
     override fun onStandardOutput(text: String) {
@@ -52,7 +43,7 @@ abstract class BaseCommandExecution(
     }
 
     override fun processFinished(exitCode: Int) {
-        myLogger.message("##teamcity[blockClosed name='$myCommandLineTruncated']")
+        myLogger.message("##teamcity[blockClosed name='${describe()}']")
         myLogger.apply {
             if (exitCode != 0) {
                 myHasProblem = true

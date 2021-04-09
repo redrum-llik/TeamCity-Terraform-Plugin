@@ -9,6 +9,8 @@ class TFEnvInstallCommandExecution(
         buildRunnerContext: BuildRunnerContext,
         flowId: String
 ) : BaseTFEnvCommandExecution(buildRunnerContext, flowId) {
+    override fun describe(): String = "tfenv install"
+
     override fun prepareCommandArguments(
             config: TerraformRunnerInstanceConfiguration,
             builder: CommandLineBuilder

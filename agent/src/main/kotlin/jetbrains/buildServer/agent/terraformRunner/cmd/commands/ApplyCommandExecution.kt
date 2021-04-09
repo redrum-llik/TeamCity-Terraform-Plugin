@@ -10,6 +10,8 @@ class ApplyCommandExecution(
         buildRunnerContext: BuildRunnerContext,
         flowId: String
 ) : BaseCommandExecution(buildRunnerContext, flowId) {
+    override fun describe(): String = "terraform apply"
+
     override fun prepareArguments(
             config: TerraformRunnerInstanceConfiguration,
             builder: CommandLineBuilder

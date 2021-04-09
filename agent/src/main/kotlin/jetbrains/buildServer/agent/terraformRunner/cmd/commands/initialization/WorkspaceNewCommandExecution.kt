@@ -23,9 +23,10 @@ class WorkspaceNewCommandExecution(
         return builder
     }
 
+    override fun describe(): String = "terraform workspace new"
+
     override fun processFinished(exitCode: Int) {
-        myLogger.message("##teamcity[blockClosed name='$myCommandLineTruncated']")
-        val config = TerraformRunnerInstanceConfiguration(buildRunnerContext.runnerParameters)
+        myLogger.message("##teamcity[blockClosed name='${describe()}']")
         myLogger.apply {
             if (exitCode != 0) {
                 val result = findInErrorOutput(pattern)

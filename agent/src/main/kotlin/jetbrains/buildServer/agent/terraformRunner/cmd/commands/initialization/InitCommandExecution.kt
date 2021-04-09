@@ -9,6 +9,8 @@ class InitCommandExecution(
     buildRunnerContext: BuildRunnerContext,
     flowId: String
 ) : BaseInitializationCommandExecution(buildRunnerContext, flowId) {
+    override fun describe(): String = "terraform init"
+
     override fun prepareArguments(
         config: TerraformRunnerInstanceConfiguration,
         builder: CommandLineBuilder

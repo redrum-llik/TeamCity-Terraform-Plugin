@@ -9,6 +9,8 @@ class CustomCommandExecution(
         flowId: String,
         private val customCommand: String
 ) : BaseCommandExecution(buildRunnerContext, flowId) {
+        override fun describe(): String = "terraform $customCommand"
+
         override fun prepareArguments(
                 config: TerraformRunnerInstanceConfiguration,
                 builder: CommandLineBuilder

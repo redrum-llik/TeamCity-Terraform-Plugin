@@ -14,6 +14,8 @@ class PlanCommandExecution(
     private val outPattern = "-out\\s(\\S*)\\s".toRegex()
     private val customOut = getPlanOutputPath()
 
+    override fun describe(): String = "terraform plan"
+
     private fun getPlanOutputPath(): OutputPath {
         val config = TerraformRunnerInstanceConfiguration(buildRunnerContext.runnerParameters)
 

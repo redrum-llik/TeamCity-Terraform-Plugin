@@ -13,6 +13,8 @@ class WorkspaceSelectCommandExecution(
 ) : BaseInitializationCommandExecution(buildRunnerContext, flowId) {
     val pattern = "Workspace \".*\" doesn't exist\\.".toRegex()
 
+    override fun describe(): String = "terraform workspace select"
+
     override fun prepareArguments(
         config: TerraformRunnerInstanceConfiguration,
         builder: CommandLineBuilder
@@ -24,7 +26,7 @@ class WorkspaceSelectCommandExecution(
     }
 
     override fun processFinished(exitCode: Int) {
-        myLogger.message("##teamcity[blockClosed name='$myCommandLineTruncated']")
+        myLogger.message("##teamcity[blockClosed name='${describe()}']")
         val config = TerraformRunnerInstanceConfiguration(buildRunnerContext.runnerParameters)
         myLogger.apply {
             if (exitCode != 0) {

@@ -6,7 +6,7 @@ import jetbrains.buildServer.agent.terraformRunner.cmd.commands.BaseCommandExecu
 import jetbrains.buildServer.runner.terraform.TerraformRunnerInstanceConfiguration
 import java.util.regex.Pattern
 
-open class BaseInitializationCommandExecution(
+abstract class BaseInitializationCommandExecution(
     buildRunnerContext: BuildRunnerContext,
     flowId: String
 ) : BaseCommandExecution(buildRunnerContext, flowId) {
