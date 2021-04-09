@@ -15,7 +15,10 @@ class TerraformRunnerDetector : BreadthFirstRunnerDiscoveryExtension() {
         filesAndDirs: MutableList<Element>
     ): MutableList<DiscoveredObject> {
         val defaultParams =
-            listOf(TerraformRunnerConstants.RUNNER_SETTING_COMMAND_KEY to TerraformCommandType.PLAN.name)
+            listOf(
+                TerraformRunnerConstants.RUNNER_SETTING_COMMAND_KEY to TerraformCommandType.PLAN.name,
+                TerraformRunnerConstants.RUNNER_SETTING_INIT_STAGE_DO_INIT_KEY to "true"
+            )
         val commandDiscoveriesPairs = mutableListOf<List<Pair<String, String>>>()
 
         discoverTerraformStep(dir, filesAndDirs, commandDiscoveriesPairs)
@@ -36,7 +39,7 @@ class TerraformRunnerDetector : BreadthFirstRunnerDiscoveryExtension() {
         if (isTerraformDiscovered(filesAndDirs)) {
             commandDiscoveriesPairs.add(
                 listOf(
-                    TerraformRunnerConstants.RUNNER_SETTING_ADDITIONAL_ARGS to "test"
+                    "teamcity.build.workingDir" to dir.fullName
                 )
             )
         }
