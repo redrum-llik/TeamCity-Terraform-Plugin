@@ -5,7 +5,6 @@ import jetbrains.buildServer.agent.runner.ProgramCommandLine
 import jetbrains.buildServer.agent.runner.SimpleProgramCommandLine
 
 class CommandLineBuilder {
-    private val LOG = Logger.getInstance(this.javaClass.name)
     private val arguments: ArrayList<String> = ArrayList()
     private val environment: MutableMap<String, String> = HashMap()
     var workingDir: String = String()
@@ -43,33 +42,5 @@ class CommandLineBuilder {
                 arguments.add("$argName=$value")
             }
         }
-    }
-
-    fun getArgumentValue(argName: String): String? {
-        if (arguments.contains(argName)) {
-            val argNamePos = arguments.indexOf(argName)
-            return try {
-                arguments[argNamePos + 1]
-            } catch (e: NullPointerException) {
-                LOG.warn("Could not find argument value for the argument: $argName")
-                null
-            }
-
-        }
-        LOG.debug("There is no such argument added: $argName")
-        return null
-    }
-
-    fun setEnvironment(newEnvironment: Map<String, String>) {
-        environment.putAll(newEnvironment)
-    }
-
-    fun addEnvironmentVariable(varName: String, value: String = String()) {
-        if (environment.containsKey(varName)) {
-            LOG.warn("Overriding environment variable $varName with value $value")
-        } else {
-            LOG.debug("Adding environment variable $varName: $value")
-        }
-        environment[varName] = value
     }
 }

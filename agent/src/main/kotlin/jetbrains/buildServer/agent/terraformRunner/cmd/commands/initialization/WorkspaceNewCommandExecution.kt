@@ -11,7 +11,7 @@ class WorkspaceNewCommandExecution(
     flowId: String,
     private val workspaceName: String
 ) : BaseInitializationCommandExecution(buildRunnerContext, flowId) {
-    val pattern = "Workspace \".*\" already exists".toRegex()
+    private val pattern = "Workspace \".*\" already exists".toRegex()
 
     override fun prepareArguments(
         config: TerraformRunnerInstanceConfiguration,

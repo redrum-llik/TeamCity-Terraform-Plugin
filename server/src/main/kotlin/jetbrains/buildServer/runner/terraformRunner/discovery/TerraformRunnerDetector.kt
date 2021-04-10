@@ -7,8 +7,8 @@ import jetbrains.buildServer.serverSide.discovery.DiscoveredObject
 import jetbrains.buildServer.util.browser.Element
 
 class TerraformRunnerDetector : BreadthFirstRunnerDiscoveryExtension() {
-    private val TF_EXTENSION = ".tf"
-    private val TF_JSON_EXTENSION = ".tf.json"
+    private val tfExtension = ".tf"
+    private val tfJsonExtension = ".tf.json"
 
     override fun discoverRunnersInDirectory(
         dir: Element,
@@ -47,8 +47,8 @@ class TerraformRunnerDetector : BreadthFirstRunnerDiscoveryExtension() {
 
     private fun isTerraformDiscovered(filesAndDirs: List<Element>): Boolean {
         return filesAndDirs.let {
-            checkFileExtensionPresence(it, TF_EXTENSION) ||
-                    checkFileExtensionPresence(it, TF_JSON_EXTENSION)
+            checkFileExtensionPresence(it, tfExtension) ||
+                    checkFileExtensionPresence(it, tfJsonExtension)
         }
     }
 

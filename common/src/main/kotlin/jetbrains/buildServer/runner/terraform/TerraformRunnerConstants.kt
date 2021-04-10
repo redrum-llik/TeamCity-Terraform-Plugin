@@ -26,9 +26,9 @@ object TerraformRunnerConstants {
     const val BUILD_PARAM_SEARCH_TFENV_PATH = "teamcity.tfenv.detector.search.paths"
 
     const val AGENT_PARAM_TERRAFORM_PREFIX = "terraform"
-    const val AGENT_PARAM_TFENV_PREFIX = "tfenv"
+    private const val AGENT_PARAM_TFENV_PREFIX = "tfenv"
     const val AGENT_PARAM_PATH_POSTFIX = "path"
-    const val AGENT_PARAM_PATH_VERSION = "version"
+    private const val AGENT_PARAM_PATH_VERSION = "version"
 
     const val AGENT_PARAM_TERRAFORM_PATH = AGENT_PARAM_TERRAFORM_PREFIX +
             ".${AGENT_PARAM_PATH_POSTFIX}"
@@ -39,10 +39,6 @@ object TerraformRunnerConstants {
             ".${AGENT_PARAM_PATH_POSTFIX}"
     const val AGENT_PARAM_TFENV_VERSION = AGENT_PARAM_TFENV_PREFIX +
             ".${AGENT_PARAM_PATH_VERSION}"
-
-    // build parameters
-    const val BUILD_PARAM_OUT_ARTIFACT_PATH = "$AGENT_PARAM_TERRAFORM_PREFIX.plan.output"
-
 }
 
 fun getVersionedPathVarName(version: String): String {

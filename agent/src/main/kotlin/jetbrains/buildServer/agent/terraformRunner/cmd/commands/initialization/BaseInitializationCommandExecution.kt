@@ -4,13 +4,12 @@ import jetbrains.buildServer.agent.BuildRunnerContext
 import jetbrains.buildServer.agent.terraformRunner.cmd.CommandLineBuilder
 import jetbrains.buildServer.agent.terraformRunner.cmd.commands.BaseCommandExecution
 import jetbrains.buildServer.runner.terraform.TerraformRunnerInstanceConfiguration
-import java.util.regex.Pattern
 
 abstract class BaseInitializationCommandExecution(
     buildRunnerContext: BuildRunnerContext,
     flowId: String
 ) : BaseCommandExecution(buildRunnerContext, flowId) {
-    protected var processErrorOutput = mutableListOf<String>()
+    private var processErrorOutput = mutableListOf<String>()
 
     override fun onErrorOutput(text: String) {
         text.lines().forEach {

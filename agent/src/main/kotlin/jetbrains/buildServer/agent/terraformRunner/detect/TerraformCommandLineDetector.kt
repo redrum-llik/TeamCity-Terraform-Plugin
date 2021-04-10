@@ -15,7 +15,7 @@ import jetbrains.buildServer.runner.terraform.TerraformRunnerConstants as Common
 
 
 class TerraformCommandLineDetector : TerraformDetector {
-    private val LOG = Logger.getInstance(this.javaClass.name)
+    private val logger = Logger.getInstance(this.javaClass.name)
 
     override fun detectTerraformInstances(buildAgentConfiguration: BuildAgentConfiguration): MutableMap<String, TFExecutableInstance> {
         val instances = HashMap<String, TFExecutableInstance>()
@@ -45,7 +45,7 @@ class TerraformCommandLineDetector : TerraformDetector {
         commandLine.addParameter(RunnerConst.PARAM_VERSION)
         commandLine.setWorkDirectory(detectionPath.path)
 
-        LOG.debug("Detecting Terraform in: $detectionPath")
+        logger.debug("Detecting Terraform in: $detectionPath")
         return handleDetectionProcess(commandLine)
     }
 
@@ -59,7 +59,7 @@ class TerraformCommandLineDetector : TerraformDetector {
         if (!StringUtil.isEmptyOrSpaces(stdErr)) {
             b.append("\n----- stderr: -----\n").append(stdErr).append("\n")
         }
-        LOG.warn(b.toString())
+        logger.warn(b.toString())
     }
 
     private fun handleDetectionProcess(commandLine: GeneralCommandLine): ProcessOutput? {

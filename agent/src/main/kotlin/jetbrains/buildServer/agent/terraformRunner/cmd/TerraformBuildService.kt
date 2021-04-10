@@ -11,7 +11,7 @@ abstract class TerraformBuildService(
         protected val buildRunnerContext: BuildRunnerContext
 ) : MultiCommandBuildSession {
     protected val myFlowId: String = FlowGenerator.generateNewFlow()
-    protected val myLogger = buildRunnerContext.build.buildLogger.getFlowLogger(myFlowId)
+    private val myLogger = buildRunnerContext.build.buildLogger.getFlowLogger(myFlowId)
     private val myCommands: List<BaseCommandExecution> = this.instantiateCommands()
     private val myCommandIterator: Iterator<BaseCommandExecution> = myCommands.iterator()
     private val myCurrentCommand: BaseCommandExecution? = null

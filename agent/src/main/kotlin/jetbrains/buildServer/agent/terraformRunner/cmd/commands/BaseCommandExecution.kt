@@ -2,6 +2,7 @@ package jetbrains.buildServer.agent.terraformRunner.cmd.commands
 
 import com.google.gson.Gson
 import jetbrains.buildServer.agent.BuildRunnerContext
+import jetbrains.buildServer.agent.FlowLogger
 import jetbrains.buildServer.agent.runner.CommandExecution
 import jetbrains.buildServer.agent.runner.ProgramCommandLine
 import jetbrains.buildServer.agent.runner.TerminationAction
@@ -20,7 +21,7 @@ abstract class BaseCommandExecution(
 ) : CommandExecution {
     val buildProblemMaxLength = 25
 
-    protected val myLogger = buildRunnerContext.build.buildLogger.getFlowLogger(flowId)
+    protected val myLogger: FlowLogger = buildRunnerContext.build.buildLogger.getFlowLogger(flowId)
     protected var myHasProblem: Boolean = false
 
     abstract fun describe(): String

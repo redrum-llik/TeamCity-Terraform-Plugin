@@ -6,11 +6,4 @@ enum class TerraformCommandType(val id: String) {
     PLAN("plan"),
     APPLY("apply"),
     WORKSPACE("workspace");
-
-    companion object {
-        @JvmStatic
-        fun fromValue(value: String): TerraformCommandType {
-            return valueOf(value)
-        }
-    }
 }

@@ -28,7 +28,7 @@ class TerraformRunnerInstanceConfiguration(private val properties: Map<String, S
         return properties[TerraformRunnerConstants.RUNNER_SETTING_CUSTOM_COMMAND_KEY]
     }
 
-    fun checkType(other: TerraformCommandType): Boolean {
+    private fun checkType(other: TerraformCommandType): Boolean {
         return getCommand() == other
     }
 

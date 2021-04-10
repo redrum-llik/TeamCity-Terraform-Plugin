@@ -11,7 +11,7 @@ class WorkspaceSelectCommandExecution(
     flowId: String,
     private val workspaceName: String
 ) : BaseInitializationCommandExecution(buildRunnerContext, flowId) {
-    val pattern = "Workspace \".*\" doesn't exist\\.".toRegex()
+    private val pattern = "Workspace \".*\" doesn't exist\\.".toRegex()
 
     override fun describe(): String = "terraform workspace select"
 

@@ -20,7 +20,7 @@ class TerraformAgentInfoProvider(
 ) {
     private val myTFHolder = TerraformInstanceHolder()
     private val myTFEnvHolder = TerraformInstanceHolder()
-    private val LOG = Logger.getInstance(this.javaClass.name)
+    private val logger = Logger.getInstance(this.javaClass.name)
 
     init {
         events.addListener(
@@ -38,9 +38,9 @@ class TerraformAgentInfoProvider(
         configuration: BuildAgentConfiguration?
     ) {
         for (detector in detectors) {
-            LOG.debug("Detecting Terraform with ${detector.javaClass.name}.")
+            logger.debug("Detecting Terraform with ${detector.javaClass.name}.")
             for (entry in detector.detectTerraformInstances(configuration!!).entries) {
-                LOG.debug("Processing detected Terraform instance [${entry.key}][${entry.value.version}]")
+                logger.debug("Processing detected Terraform instance [${entry.key}][${entry.value.version}]")
                 myTFHolder.addInstance(entry.key, entry.value)
             }
         }
@@ -49,7 +49,7 @@ class TerraformAgentInfoProvider(
             registerMainTFInstance(myTFHolder.getMainInstance())
             registerTFInstances(myTFHolder.getInstances())
         } else {
-            LOG.info(
+            logger.info(
                 "No Terraform instance detected. If it is not available on PATH, " +
                         "please provide a custom path with ${CommonConst.BUILD_PARAM_SEARCH_TF_PATH} agent property."
             )
@@ -61,9 +61,9 @@ class TerraformAgentInfoProvider(
             configuration: BuildAgentConfiguration?
     ) {
         for (detector in detectors) {
-            LOG.debug("Detecting TFEnv with ${detector.javaClass.name}.")
+            logger.debug("Detecting TFEnv with ${detector.javaClass.name}.")
             for (entry in detector.detectTFEnvInstances(configuration!!).entries) {
-                LOG.debug("Processing detected TFEnv instance [${entry.key}][${entry.value.version}]")
+                logger.debug("Processing detected TFEnv instance [${entry.key}][${entry.value.version}]")
                 myTFEnvHolder.addInstance(entry.key, entry.value)
             }
         }
@@ -71,7 +71,7 @@ class TerraformAgentInfoProvider(
         if (!myTFEnvHolder.isEmpty()) {
             registerMainTFEnvInstance(myTFEnvHolder.getMainInstance())
         } else {
-            LOG.info(
+            logger.info(
                     "No TFEnv instance detected. If it is not available on PATH, " +
                             "please provide a custom path with ${CommonConst.BUILD_PARAM_SEARCH_TFENV_PATH} agent property."
             )
@@ -80,15 +80,15 @@ class TerraformAgentInfoProvider(
 
     private fun registerTFInstances(instances: java.util.HashMap<String, TFExecutableInstance>) {
         for (instance in instances.values) {
-            LOG.info("Registering detected Terraform instance at ${instance.executablePath}")
+            logger.info("Registering detected Terraform instance at ${instance.executablePath}")
 
             val terraformVersionedPathName = getVersionedPathVarName(instance.version)
             myConfig.addConfigurationParameter(terraformVersionedPathName, instance.executablePath)
         }
     }
 
-    private fun registerMainTFInstance(mainInstance: TFExecutableInstance) { //#FIXME no need to save .path if it is equal to agent work dir
-        LOG.info("Registering detected Terraform instance at ${mainInstance.executablePath} as main instance")
+    private fun registerMainTFInstance(mainInstance: TFExecutableInstance) {
+        logger.info("Registering detected Terraform instance at ${mainInstance.executablePath} as main instance")
 
         myConfig.addConfigurationParameter(CommonConst.AGENT_PARAM_TERRAFORM_VERSION, mainInstance.version)
         if (!mainInstance.isDefault) {
@@ -97,7 +97,7 @@ class TerraformAgentInfoProvider(
     }
 
     private fun registerMainTFEnvInstance(mainInstance: TFExecutableInstance) {
-        LOG.info("Registering detected TFEnv instance at ${mainInstance.executablePath} as main instance")
+        logger.info("Registering detected TFEnv instance at ${mainInstance.executablePath} as main instance")
 
         myConfig.addConfigurationParameter(CommonConst.AGENT_PARAM_TFENV_VERSION, mainInstance.version)
         if (!mainInstance.isDefault) {
