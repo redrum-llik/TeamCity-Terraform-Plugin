@@ -4,11 +4,11 @@
     <info>
         <name>terraformSupport</name>
         <display-name>Terraform Support</display-name>
-        <version>@Plugin_Version@</version> <!-- will be replaced from script -->
+        <version>@Version@</version> <!-- will be replaced from script -->
         <vendor>
             <name>JetBrains</name>  <!-- will be replaced from script -->
             <url>https://jetbrains.com</url> <!-- will be replaced from script -->
         </vendor>
     </info>
-    <deployment use-separate-classloader="true"/>
+    <deployment use-separate-classloader="true" allow-runtime-reload="true" node-responsibilities-aware="true"/>
 </teamcity-plugin>

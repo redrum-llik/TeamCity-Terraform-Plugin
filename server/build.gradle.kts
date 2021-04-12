@@ -20,15 +20,8 @@ teamcity {
     version = rootProject.ext["teamcityVersion"] as String
 
     server {
-        descriptor {
-            name = "terraformSupport"
-            displayName = "Terraform Support"
-            version = rootProject.version as String?
-            vendorName = "JetBrains"
-            vendorUrl = "https://jetbrains.com"
-            description = "Provides runner for Terraform playbook execution"
-            useSeparateClassloader = true
-        }
+        descriptor = file("teamcity-plugin.xml")
+        tokens = mapOf("Version" to rootProject.version)
         archiveName = "terraform-plugin"
     }
 
