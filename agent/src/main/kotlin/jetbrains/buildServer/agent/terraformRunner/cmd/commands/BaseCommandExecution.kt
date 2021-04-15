@@ -25,8 +25,9 @@ abstract class BaseCommandExecution(
 
     protected val myLogger: FlowLogger = buildRunnerContext.build.buildLogger.getFlowLogger(flowId)
     protected var myHasProblem: Boolean = false
+    protected var myProblemIdentityHash: String? = null
 
-    protected abstract fun describe(): String
+    abstract fun describe(): String
 
     private fun replacePasswords(text: String): String { //https://youtrack.jetbrains.com/issue/TW-45987
         val passwordReplacer = buildRunnerContext.build.passwordReplacer
@@ -165,5 +166,9 @@ abstract class BaseCommandExecution(
 
     fun hasProblem(): Boolean {
         return myHasProblem
+    }
+
+    fun problemIdentity(): String {
+        return if (myProblemIdentityHash == null) describe() else myProblemIdentityHash!!
     }
 }

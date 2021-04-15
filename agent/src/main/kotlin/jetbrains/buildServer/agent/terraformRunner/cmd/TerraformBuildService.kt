@@ -44,7 +44,7 @@ abstract class TerraformBuildService(
         problemCommands.forEach {
             val buildProblem = "${it.describe()} failed"
             myLogger.logBuildProblem(
-                    BuildProblemData.createBuildProblem("Terraform command execution failed", "TerraformExecutionProblem", buildProblem)
+                    BuildProblemData.createBuildProblem(it.problemIdentity(), "TerraformExecutionProblem", buildProblem)
             )
         }
 
