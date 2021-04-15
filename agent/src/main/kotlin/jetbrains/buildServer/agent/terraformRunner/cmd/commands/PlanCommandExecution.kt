@@ -3,6 +3,8 @@ package jetbrains.buildServer.agent.terraformRunner.cmd.commands
 import jetbrains.buildServer.agent.BuildRunnerContext
 import jetbrains.buildServer.agent.terraformRunner.TerraformCommandLineConstants
 import jetbrains.buildServer.agent.terraformRunner.cmd.CommandLineBuilder
+import jetbrains.buildServer.messages.serviceMessages.ServiceMessage
+import jetbrains.buildServer.messages.serviceMessages.ServiceMessageTypes
 import jetbrains.buildServer.runner.terraform.TerraformCommandType
 import jetbrains.buildServer.runner.terraform.TerraformRunnerInstanceConfiguration
 import java.io.File
@@ -50,7 +52,8 @@ class PlanCommandExecution(
         ).relativeTo(basePath).path
         val rule = "+:$relativePath"
         myLogger.message("Publishing 'terraform plan' output with the following rule: '$rule'")
-        myLogger.message("##teamcity[publishArtifacts '$rule']") //#FIXME see other service messages
+        val serviceMessage = ServiceMessage.asString(ServiceMessageTypes.PUBLISH_ARTIFACTS, rule)
+        myLogger.message(serviceMessage)
     }
 
     override fun prepareArguments(

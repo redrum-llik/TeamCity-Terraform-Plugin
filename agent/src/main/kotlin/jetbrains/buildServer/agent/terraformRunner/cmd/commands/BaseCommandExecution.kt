@@ -8,6 +8,8 @@ import jetbrains.buildServer.agent.runner.ProgramCommandLine
 import jetbrains.buildServer.agent.runner.TerminationAction
 import jetbrains.buildServer.agent.terraformRunner.TerraformCommandLineConstants as RunnerConst
 import jetbrains.buildServer.agent.terraformRunner.cmd.CommandLineBuilder
+import jetbrains.buildServer.messages.serviceMessages.ServiceMessage
+import jetbrains.buildServer.messages.serviceMessages.ServiceMessageTypes
 import jetbrains.buildServer.runner.terraform.TerraformRunnerInstanceConfiguration
 import jetbrains.buildServer.runner.terraform.TerraformRunnerConstants as CommonConst
 
@@ -24,10 +26,19 @@ abstract class BaseCommandExecution(
     protected val myLogger: FlowLogger = buildRunnerContext.build.buildLogger.getFlowLogger(flowId)
     protected var myHasProblem: Boolean = false
 
-    abstract fun describe(): String
+    protected abstract fun describe(): String
+
+    private fun replacePasswords(text: String): String { //https://youtrack.jetbrains.com/issue/TW-45987
+        val passwordReplacer = buildRunnerContext.build.passwordReplacer
+        return passwordReplacer.replacePasswords(text)
+    }
 
     override fun processStarted(programCommandLine: String, workingDirectory: File) {
-        myLogger.message("##teamcity[blockOpened name='${describe()}']") //#FIXME might be a better way (push them from buildservice? any class to compose the service messages?)
+        val serviceMessage = ServiceMessage.asString(
+            ServiceMessageTypes.BLOCK_OPENED,
+            mapOf("name" to replacePasswords(describe()))
+        )
+        myLogger.message(serviceMessage)
         myLogger.message("Starting: $programCommandLine")
     }
 
@@ -44,7 +55,11 @@ abstract class BaseCommandExecution(
     }
 
     override fun processFinished(exitCode: Int) {
-        myLogger.message("##teamcity[blockClosed name='${describe()}']")
+        val serviceMessage = ServiceMessage.asString(
+            ServiceMessageTypes.BLOCK_CLOSED,
+            mapOf("name" to replacePasswords(describe()))
+        )
+        myLogger.message(serviceMessage)
         myLogger.apply {
             if (exitCode != 0) {
                 myHasProblem = true
@@ -116,7 +131,7 @@ abstract class BaseCommandExecution(
     ): String {
         val gson = Gson()
         val varFile = File(
-            buildRunnerContext.build.buildTempDirectory.absolutePath,
+            buildRunnerContext.build.agentTempDirectory.absolutePath,
             "terraform_varfile_${UUID.randomUUID()}.json"
         ).normalize()
         val writer = FileWriter(varFile)

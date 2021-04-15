@@ -56,7 +56,7 @@ class TFEnvCommandLineDetector : TFEnvDetector {
         if (!StringUtil.isEmptyOrSpaces(stdErr)) {
             b.append("\n----- stderr: -----\n").append(stdErr).append("\n")
         }
-        LOG.warn(b.toString())
+        LOG.debug(b.toString())
     }
 
     private fun handleDetectionProcess(commandLine: GeneralCommandLine): ProcessOutput? {
@@ -80,6 +80,7 @@ class TFEnvCommandLineDetector : TFEnvDetector {
 
     companion object {
         private val terraformVersionPattern = "tfenv ([0-9.]*)".toRegex()
+        private val LOG = Logger.getInstance(this::class.java.name)
 
         data class SearchPath(
                 val path: String,
@@ -103,6 +104,11 @@ class TFEnvCommandLineDetector : TFEnvDetector {
                     detectionPath.path,
                     detectionPath.isDefault
             )
+
+            when (detectionPath.isDefault) {
+                true -> LOG.info("Found tfenv $version instance in PATH")
+                false -> LOG.info("Found tfenv $version instance in ${detectionPath.path}")
+            }
         }
     }
 }

@@ -59,7 +59,7 @@ class TerraformCommandLineDetector : TerraformDetector {
         if (!StringUtil.isEmptyOrSpaces(stdErr)) {
             b.append("\n----- stderr: -----\n").append(stdErr).append("\n")
         }
-        logger.warn(b.toString())
+        logger.debug(b.toString())
     }
 
     private fun handleDetectionProcess(commandLine: GeneralCommandLine): ProcessOutput? {
@@ -84,6 +84,7 @@ class TerraformCommandLineDetector : TerraformDetector {
 
     companion object {
         private val terraformVersionPattern = "v([0-9.]*)".toRegex()
+        private val LOG = Logger.getInstance(this::class.java.name)
 
         data class SearchPath(
             val path: String,
@@ -107,6 +108,11 @@ class TerraformCommandLineDetector : TerraformDetector {
                 detectionPath.path,
                 detectionPath.isDefault
             )
+
+            when (detectionPath.isDefault) {
+                true -> LOG.info("Found Terraform $version instance in PATH")
+                false -> LOG.info("Found Terraform $version instance in ${detectionPath.path}")
+            }
         }
     }
 }
