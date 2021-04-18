@@ -39,6 +39,8 @@ For tfenv mode: installed tfenv on the agent side.
 
 **Additional arguments**: any extra arguments to be passed to the command.
 
+**Pass system parameters**: add `--extra-vars` argument pointing to the temporary file with system variables (see below).
+
 ## Docker Settings
 
 See the relevant information on the [Docker Wrapper](https://www.jetbrains.com/help/teamcity/docker-wrapper.html) documentation page.
@@ -63,6 +65,7 @@ The runner will impose the following [agent requirements](https://www.jetbrains.
 * `terraform.version` exists
 * `tfenv.version` exists
 
-## Prefixed parameters
+## System parameters
 
-Any system build parameter which starts with the `system.terraform.` prefix will be exported into a temporary JSON file. This file will be supplied as the `-var-file` value. This allows easily passing a TeamCity parameter into the execution context.
+If a corresponding option is enabled, system build parameters will be exported into a temporary JSON file. This file will be supplied as the `-var-file` value. The dots (`.`) in parameter name are replaced with underscores (`_`) to provide a valid variable identifier. 
+If an additional arguments field does contain the `-var-file` argument too, this option should be turned off.
