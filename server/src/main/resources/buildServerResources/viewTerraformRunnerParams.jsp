@@ -12,6 +12,7 @@
 <jsp:useBean id="initStageBean" class="jetbrains.buildServer.runner.terraformRunner.beans.InitStageBean"/>
 <jsp:useBean id="outputPathBean" class="jetbrains.buildServer.runner.terraformRunner.beans.OutputPathBean"/>
 <jsp:useBean id="stateBackupPathBean" class="jetbrains.buildServer.runner.terraformRunner.beans.StateBackupPathBean"/>
+<jsp:useBean id="passSystemParametersBean" class="jetbrains.buildServer.runner.terraformRunner.beans.PassSystemParametersBean"/>
 <jsp:useBean id="versionBean" class="jetbrains.buildServer.runner.terraformRunner.beans.VersionBean"/>
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
 
@@ -74,3 +75,7 @@
         ${initStageBean.createWorkspaceIfNotFoundLabel} <props:displayCheckboxValue name="${initStageBean.createWorkspaceIfNotFoundKey}" checkedValue="Yes" uncheckedValue="No"/>
     </div>
 </c:if>
+
+<div class="parameter">
+    ${passSystemParametersBean.label} <props:displayCheckboxValue name="${passSystemParametersBean.key}" checkedValue="Yes" uncheckedValue="No"/>
+</div>

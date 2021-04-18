@@ -10,7 +10,7 @@ import jetbrains.buildServer.agent.BuildAgentConfiguration
 import java.nio.charset.StandardCharsets
 import java.util.*
 import kotlin.collections.HashMap
-import jetbrains.buildServer.agent.terraformRunner.TerraformCommandLineConstants as RunnerConst
+import jetbrains.buildServer.runner.terraform.TerraformCommandLineConstants as RunnerConst
 import jetbrains.buildServer.runner.terraform.TerraformRunnerConstants as CommonConst
 
 

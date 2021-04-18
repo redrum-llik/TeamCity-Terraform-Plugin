@@ -6,7 +6,7 @@ import jetbrains.buildServer.agent.FlowLogger
 import jetbrains.buildServer.agent.runner.CommandExecution
 import jetbrains.buildServer.agent.runner.ProgramCommandLine
 import jetbrains.buildServer.agent.runner.TerminationAction
-import jetbrains.buildServer.agent.terraformRunner.TerraformCommandLineConstants as RunnerConst
+import jetbrains.buildServer.runner.terraform.TerraformCommandLineConstants as RunnerConst
 import jetbrains.buildServer.agent.terraformRunner.cmd.CommandLineBuilder
 import jetbrains.buildServer.messages.serviceMessages.ServiceMessage
 import jetbrains.buildServer.messages.serviceMessages.ServiceMessageTypes
@@ -25,7 +25,7 @@ abstract class BaseCommandExecution(
 
     protected val myLogger: FlowLogger = buildRunnerContext.build.buildLogger.getFlowLogger(flowId)
     protected var myHasProblem: Boolean = false
-    protected var myProblemIdentityHash: String? = null
+    protected var myProblemIdentityHash: Int? = null
 
     abstract fun describe(): String
 
@@ -46,6 +46,7 @@ abstract class BaseCommandExecution(
     override fun onStandardOutput(text: String) {
         text.lines().forEach {
             myLogger.message(it)
+
         }
     }
 
@@ -53,6 +54,7 @@ abstract class BaseCommandExecution(
         text.lines().forEach {
             myLogger.error(it)
         }
+        myProblemIdentityHash = text.hashCode()
     }
 
     override fun processFinished(exitCode: Int) {
@@ -100,15 +102,29 @@ abstract class BaseCommandExecution(
         config: TerraformRunnerInstanceConfiguration,
         builder: CommandLineBuilder
     ): CommandLineBuilder {
-        val extraArgs = config.getExtraArgs()
+        val extraArgs = config.getAdditionalArgs()
         if (!extraArgs.isNullOrEmpty()) {
             builder.addArgument(value = extraArgs)
+        }
+
+        if (config.getPassSystemParams()) {
+            prepareSystemParametersAsVarFile(builder)
         }
 
         return builder
     }
 
-    protected fun preparePrefixedSystemParametersAsArguments(
+    private fun formatSystemProperties(): MutableMap<String, String> {
+        val result: MutableMap<String, String> = HashMap()
+        for (parameter in buildRunnerContext.build.sharedBuildParameters.systemProperties) {
+            // Terraform variables cannot include dots
+            val newKey = parameter.key.replace(".", "_")
+            result[newKey] = parameter.value
+        }
+        return result
+    }
+
+    protected fun prepareSystemParametersAsVarFile(
         builder: CommandLineBuilder
     ): CommandLineBuilder {
         builder.addArgument(
@@ -119,27 +135,15 @@ abstract class BaseCommandExecution(
         return builder
     }
 
-    protected fun checkTerraformPrefixedSystemParameters(): Boolean {
-        buildRunnerContext.build.sharedBuildParameters.systemProperties.forEach { param ->
-            if (param.key.startsWith(CommonConst.BUILD_PARAM_SYSTEM_TERRAFORM_PREFIX)) {
-                return true
-            }
-        }
-        return false
-    }
-
     private fun saveArgumentsToFile(
     ): String {
-        val gson = Gson()
         val varFile = File(
             buildRunnerContext.build.agentTempDirectory.absolutePath,
             "terraform_varfile_${UUID.randomUUID()}.json"
         ).normalize()
         val writer = FileWriter(varFile)
-        val json = gson.toJson(
-            buildRunnerContext.build.sharedBuildParameters.systemProperties.filterKeys {
-                it.startsWith(CommonConst.BUILD_PARAM_SYSTEM_TERRAFORM_PREFIX)
-            }
+        val json = Gson().toJson(
+            formatSystemProperties()
         )
         writer.run {
             write(json)
@@ -169,6 +173,6 @@ abstract class BaseCommandExecution(
     }
 
     fun problemIdentity(): String {
-        return if (myProblemIdentityHash == null) describe() else myProblemIdentityHash!!
+        return if (myProblemIdentityHash == null) describe() else myProblemIdentityHash!!.toString()
     }
 }

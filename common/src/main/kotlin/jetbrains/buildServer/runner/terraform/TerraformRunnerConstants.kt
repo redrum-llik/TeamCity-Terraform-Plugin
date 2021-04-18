@@ -17,9 +17,7 @@ object TerraformRunnerConstants {
     const val RUNNER_SETTING_INIT_STAGE_CREATE_WORKSPACE_IF_NOT_FOUND_KEY = "createWorkspace"
     const val RUNNER_SETTING_APPLY_CUSTOM_BACKUP_KEY = "stateBackupPath"
     const val RUNNER_SETTING_ADDITIONAL_ARGS = "additionalArguments"
-
-    // prefix for Terraform system parameters
-    const val BUILD_PARAM_SYSTEM_TERRAFORM_PREFIX = "system.terraform."
+    const val RUNNER_SETTING_PASS_SYSTEM_PARAMS = "passSystemParams"
 
     // detection variables
     const val BUILD_PARAM_SEARCH_TF_PATH = "teamcity.terraform.detector.search.paths"

@@ -1,7 +1,7 @@
 package jetbrains.buildServer.agent.terraformRunner.cmd.commands
 
 import jetbrains.buildServer.agent.BuildRunnerContext
-import jetbrains.buildServer.agent.terraformRunner.TerraformCommandLineConstants
+import jetbrains.buildServer.runner.terraform.TerraformCommandLineConstants
 import jetbrains.buildServer.agent.terraformRunner.cmd.CommandLineBuilder
 import jetbrains.buildServer.messages.serviceMessages.ServiceMessage
 import jetbrains.buildServer.messages.serviceMessages.ServiceMessageTypes
@@ -26,7 +26,7 @@ class PlanCommandExecution(
             return OutputPath(planCustomOut, true)
         }
 
-        val extraArgs = config.getExtraArgs()
+        val extraArgs = config.getAdditionalArgs()
         if (!extraArgs.isNullOrEmpty() &&
             extraArgs.contains(TerraformCommandLineConstants.PARAM_CUSTOM_OUT)
         ) {
@@ -67,10 +67,6 @@ class PlanCommandExecution(
                 TerraformCommandLineConstants.PARAM_CUSTOM_OUT,
                 customOut.path
             )
-        }
-
-        if (checkTerraformPrefixedSystemParameters()) {
-            preparePrefixedSystemParametersAsArguments(builder)
         }
 
         return builder

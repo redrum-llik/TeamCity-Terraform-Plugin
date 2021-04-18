@@ -1,4 +1,4 @@
-package jetbrains.buildServer.agent.terraformRunner
+package jetbrains.buildServer.runner.terraform
 
 object TerraformCommandLineConstants {
     // terraform commands and parameters

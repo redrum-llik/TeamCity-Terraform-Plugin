@@ -16,6 +16,7 @@ class CustomCommandExecution(
                 builder: CommandLineBuilder
         ): CommandLineBuilder {
                 builder.addArgument(value = customCommand)
+
                 return builder
         }
 }

@@ -66,7 +66,11 @@ class TerraformRunnerInstanceConfiguration(private val properties: Map<String, S
 
     // common parameters
 
-    fun getExtraArgs(): String? {
+    fun getAdditionalArgs(): String? {
         return properties[TerraformRunnerConstants.RUNNER_SETTING_ADDITIONAL_ARGS]
+    }
+
+    fun getPassSystemParams(): Boolean {
+        return properties[TerraformRunnerConstants.RUNNER_SETTING_PASS_SYSTEM_PARAMS].toBoolean()
     }
 }

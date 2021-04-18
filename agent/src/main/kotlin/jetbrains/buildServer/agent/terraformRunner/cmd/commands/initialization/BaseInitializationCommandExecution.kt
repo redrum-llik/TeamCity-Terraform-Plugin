@@ -16,6 +16,7 @@ abstract class BaseInitializationCommandExecution(
             processErrorOutput.add(it)
             myLogger.error(it)
         }
+        myProblemIdentityHash = text.hashCode()
     }
 
     protected fun findInErrorOutput(pattern: Regex): MatchResult? {

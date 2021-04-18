@@ -2,7 +2,7 @@ package jetbrains.buildServer.agent.terraformRunner.cmd.commands.tfenv;
 
 import jetbrains.buildServer.agent.BuildRunnerContext
 import jetbrains.buildServer.agent.runner.ProgramCommandLine
-import jetbrains.buildServer.agent.terraformRunner.TerraformCommandLineConstants
+import jetbrains.buildServer.runner.terraform.TerraformCommandLineConstants
 import jetbrains.buildServer.agent.terraformRunner.cmd.CommandLineBuilder
 import jetbrains.buildServer.agent.terraformRunner.cmd.commands.BaseCommandExecution
 import jetbrains.buildServer.runner.terraform.TerraformRunnerConstants
