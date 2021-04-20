@@ -68,4 +68,4 @@ The runner will impose the following [agent requirements](https://www.jetbrains.
 ## System parameters
 
 If a corresponding option is enabled, system build parameters will be exported into a temporary JSON file. This file will be supplied as the `-var-file` value. The dots (`.`) in parameter name are replaced with underscores (`_`) to provide a valid variable identifier. 
-If an additional arguments field does contain the `-var-file` argument too, this option should be turned off.
+If the additional arguments field contains the `-var-file` argument too, the logic will be skipped.
