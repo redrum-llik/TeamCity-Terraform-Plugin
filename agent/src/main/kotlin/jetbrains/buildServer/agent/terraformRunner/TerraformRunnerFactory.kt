@@ -65,7 +65,7 @@ class TerraformRunnerFactory : MultiCommandBuildSessionFactory {
     ): ArrayList<BaseCommandExecution> {
         val commands: ArrayList<BaseCommandExecution> = ArrayList()
         val config = TerraformRunnerInstanceConfiguration(buildRunnerContext.runnerParameters)
-        val workspaceName = config.getUseWorkspace()!!
+        val workspaceName = config.getUseWorkspace()
 
         if (config.getVersionMode() == TerraformVersionMode.TFENV) {
             commands.addAll(
@@ -73,17 +73,19 @@ class TerraformRunnerFactory : MultiCommandBuildSessionFactory {
             )
         }
 
-        if (config.getDoCreateWorkspaceIfNotFound()) {
-            commands.addAll(
-                arrayListOf(
-                    WorkspaceSelectCommandExecution(buildRunnerContext, flowId, workspaceName),
-                    WorkspaceNewCommandExecution(buildRunnerContext, flowId, workspaceName)
+        if (!workspaceName.isNullOrEmpty()) {
+            if (config.getDoCreateWorkspaceIfNotFound()) {
+                commands.addAll(
+                    arrayListOf(
+                        WorkspaceSelectCommandExecution(buildRunnerContext, flowId, workspaceName),
+                        WorkspaceNewCommandExecution(buildRunnerContext, flowId, workspaceName)
+                    )
                 )
-            )
-        } else {
-            commands.add(
-                WorkspaceSelectCommandExecution(buildRunnerContext, flowId, workspaceName)
-            )
+            } else {
+                commands.add(
+                    WorkspaceSelectCommandExecution(buildRunnerContext, flowId, workspaceName)
+                )
+            }
         }
 
         if (config.getDoInit()) {
