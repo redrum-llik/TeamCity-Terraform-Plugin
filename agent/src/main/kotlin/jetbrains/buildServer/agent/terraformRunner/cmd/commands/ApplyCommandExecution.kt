@@ -1,7 +1,7 @@
 package jetbrains.buildServer.agent.terraformRunner.cmd.commands
 
 import jetbrains.buildServer.agent.BuildRunnerContext
-import jetbrains.buildServer.runner.terraform.TerraformCommandLineConstants
+import jetbrains.buildServer.agent.terraformRunner.TerraformCommandLineConstants
 import jetbrains.buildServer.agent.terraformRunner.cmd.CommandLineBuilder
 import jetbrains.buildServer.runner.terraform.TerraformCommandType
 import jetbrains.buildServer.runner.terraform.TerraformRunnerInstanceConfiguration

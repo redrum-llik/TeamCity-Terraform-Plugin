@@ -4,7 +4,7 @@ import jetbrains.buildServer.agent.BuildRunnerContext
 import jetbrains.buildServer.agent.terraformRunner.cmd.CommandLineBuilder
 import jetbrains.buildServer.runner.terraform.TerraformCommandType
 import jetbrains.buildServer.runner.terraform.TerraformRunnerInstanceConfiguration
-import jetbrains.buildServer.runner.terraform.TerraformCommandLineConstants as RunnerConst
+import jetbrains.buildServer.agent.terraformRunner.TerraformCommandLineConstants as RunnerConst
 
 class WorkspaceSelectCommandExecution(
     buildRunnerContext: BuildRunnerContext,

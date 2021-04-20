@@ -7,7 +7,7 @@ import com.intellij.execution.process.ProcessOutput
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.util.text.StringUtil
 import jetbrains.buildServer.agent.BuildAgentConfiguration
-import jetbrains.buildServer.runner.terraform.TerraformCommandLineConstants
+import jetbrains.buildServer.agent.terraformRunner.TerraformCommandLineConstants
 import jetbrains.buildServer.runner.terraform.TerraformRunnerConstants
 import java.nio.charset.StandardCharsets
 import java.util.ArrayList

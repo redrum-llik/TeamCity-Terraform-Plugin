@@ -6,11 +6,12 @@ import jetbrains.buildServer.agent.FlowLogger
 import jetbrains.buildServer.agent.runner.CommandExecution
 import jetbrains.buildServer.agent.runner.ProgramCommandLine
 import jetbrains.buildServer.agent.runner.TerminationAction
-import jetbrains.buildServer.runner.terraform.TerraformCommandLineConstants as RunnerConst
+import jetbrains.buildServer.agent.terraformRunner.TerraformCommandLineConstants as RunnerConst
 import jetbrains.buildServer.agent.terraformRunner.cmd.CommandLineBuilder
 import jetbrains.buildServer.messages.serviceMessages.ServiceMessage
 import jetbrains.buildServer.messages.serviceMessages.ServiceMessageTypes
 import jetbrains.buildServer.runner.terraform.TerraformRunnerInstanceConfiguration
+import jetbrains.buildServer.util.StringUtil
 import jetbrains.buildServer.runner.terraform.TerraformRunnerConstants as CommonConst
 
 import java.io.File
@@ -102,16 +103,42 @@ abstract class BaseCommandExecution(
         config: TerraformRunnerInstanceConfiguration,
         builder: CommandLineBuilder
     ): CommandLineBuilder {
-        val extraArgs = config.getAdditionalArgs()
-        if (!extraArgs.isNullOrEmpty()) {
-            builder.addArgument(value = extraArgs)
+        val additionalArgs = config.getAdditionalArgs()
+        if (!additionalArgs.isNullOrEmpty()) {
+            for (value in StringUtil.splitHonorQuotes(additionalArgs)) {
+                builder.addArgument(value = value)
+            }
         }
 
         if (config.getPassSystemParams()) {
-            prepareSystemParametersAsVarFile(builder)
+            if (checkExtraVarsInAdditionalArgs(config)) {
+                myLogger.warning("-var-file argument detected in additional arguments; TeamCity system parameters are skipped to avoid conflict")
+            } else {
+                builder.addArgument(
+                    RunnerConst.PARAM_VAR_FILE,
+                    saveArgumentsToFile()
+                )
+            }
         }
 
         return builder
+    }
+
+    private fun getArgumentRegex(argumentName: String): Regex {
+        return "\\s?${argumentName}\\s".toRegex()
+    }
+
+    private fun checkExtraVarsInAdditionalArgs(
+        config: TerraformRunnerInstanceConfiguration
+    ): Boolean {
+        if (!config.getAdditionalArgs().isNullOrEmpty()) {
+            val additionalArgs = config.getAdditionalArgs()!!
+            if (additionalArgs.contains(getArgumentRegex(RunnerConst.PARAM_VAR_FILE))
+            ) {
+                return true
+            }
+        }
+        return false
     }
 
     private fun formatSystemProperties(): MutableMap<String, String> {
@@ -122,17 +149,6 @@ abstract class BaseCommandExecution(
             result[newKey] = parameter.value
         }
         return result
-    }
-
-    protected fun prepareSystemParametersAsVarFile(
-        builder: CommandLineBuilder
-    ): CommandLineBuilder {
-        builder.addArgument(
-            RunnerConst.PARAM_VAR_FILE,
-            saveArgumentsToFile()
-        )
-
-        return builder
     }
 
     private fun saveArgumentsToFile(

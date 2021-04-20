@@ -12,7 +12,6 @@ import jetbrains.buildServer.serverSide.RunTypeRegistry
 import jetbrains.buildServer.web.openapi.PluginDescriptor
 import java.util.*
 import jetbrains.buildServer.runner.terraform.TerraformRunnerConstants as CommonConst
-import jetbrains.buildServer.runner.terraform.TerraformCommandLineConstants as RunnerConst
 
 
 class TerraformRunType(runTypeRegistry: RunTypeRegistry, private val myDescriptor: PluginDescriptor) : RunType() {
@@ -73,27 +72,12 @@ class TerraformRunType(runTypeRegistry: RunTypeRegistry, private val myDescripto
 
     companion object {
         class ParametersValidator : PropertiesProcessor {
-            fun getArgumentRegex(argumentName: String): Regex {
-                return "\\s?${argumentName}\\s".toRegex()
-            }
-
             override fun process(properties: MutableMap<String, String>): MutableCollection<InvalidProperty> {
                 val ret: MutableCollection<InvalidProperty> = ArrayList<InvalidProperty>(1)
                 val config = TerraformRunnerInstanceConfiguration(properties)
 
                 if (config.getCommand() == TerraformCommandType.CUSTOM && config.getCustomCommand().isNullOrEmpty()) {
                     ret.add(InvalidProperty(CommonConst.RUNNER_SETTING_CUSTOM_COMMAND_KEY, "Required parameter"))
-                }
-
-                if (!config.getAdditionalArgs().isNullOrEmpty()) {
-                    val additionalArgs = config.getAdditionalArgs()!!
-                    val varFileRegex = getArgumentRegex(RunnerConst.PARAM_VAR_FILE)
-
-                    if (additionalArgs.contains(varFileRegex)) {
-                        ret.add(
-                            InvalidProperty(CommonConst.RUNNER_SETTING_PASS_SYSTEM_PARAMS, "-var-file argument detected in additional arguments field")
-                        )
-                    }
                 }
 
                 return ret

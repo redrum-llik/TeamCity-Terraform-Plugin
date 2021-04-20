@@ -28,19 +28,12 @@ class CommandLineBuilder {
     }
 
     fun addArgument(argName: String? = null, value: String? = null) {
-        when {
-            argName.isNullOrEmpty() && value.isNullOrEmpty() -> {
-                return
-            }
-            argName.isNullOrEmpty() -> {
-                arguments.add(value as String)
-            }
-            value.isNullOrEmpty() -> {
-                arguments.add(argName)
-            }
-            else -> {
-                arguments.add("$argName=$value")
-            }
+        if (!argName.isNullOrEmpty()) {
+            arguments.add(argName)
+        }
+
+        if (!value.isNullOrEmpty()) {
+            arguments.add(value)
         }
     }
 }
