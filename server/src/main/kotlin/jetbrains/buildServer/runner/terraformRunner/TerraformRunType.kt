@@ -32,7 +32,9 @@ class TerraformRunType(runTypeRegistry: RunTypeRegistry, private val myDescripto
     }
 
     override fun getDefaultRunnerProperties(): MutableMap<String, String> {
-        return HashMap()
+        val map: MutableMap<String, String> = HashMap()
+        map[CommonConst.RUNNER_SETTING_PASS_SYSTEM_PARAMS] = "true"
+        return map
     }
 
     override fun getType(): String {
