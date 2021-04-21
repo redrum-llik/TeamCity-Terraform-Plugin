@@ -9,7 +9,7 @@
 <jsp:useBean id="initStageBean" class="jetbrains.buildServer.runner.terraformRunner.beans.InitStageBean"/>
 <jsp:useBean id="outputPathBean" class="jetbrains.buildServer.runner.terraformRunner.beans.OutputPathBean"/>
 <jsp:useBean id="stateBackupPathBean" class="jetbrains.buildServer.runner.terraformRunner.beans.StateBackupPathBean"/>
-<jsp:useBean id="passSystemParametersBean" class="jetbrains.buildServer.runner.terraformRunner.beans.PassSystemParametersBean"/>
+<jsp:useBean id="passSystemPropertiesBean" class="jetbrains.buildServer.runner.terraformRunner.beans.PassSystemPropertiesBean"/>
 <jsp:useBean id="versionBean" class="jetbrains.buildServer.runner.terraformRunner.beans.VersionBean"/>
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
 
@@ -102,9 +102,9 @@
         </td>
     </tr>
     <tr class="advancedSetting">
-        <th><label>${passSystemParametersBean.label}</label></th>
-        <td><props:checkboxProperty name="${passSystemParametersBean.key}"/>
-            <label for="${passSystemParametersBean.key}">${passSystemParametersBean.description}</label>
+        <th><label>${passSystemPropertiesBean.label}</label></th>
+        <td><props:checkboxProperty name="${passSystemPropertiesBean.key}"/>
+            <label for="${passSystemPropertiesBean.key}">${passSystemPropertiesBean.description}</label>
             <br/>
         </td>
     </tr>

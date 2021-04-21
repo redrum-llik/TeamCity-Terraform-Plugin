@@ -39,7 +39,7 @@ For tfenv mode: installed tfenv on the agent side.
 
 **Additional arguments**: any extra arguments to be passed to the command.
 
-**Pass system parameters**: add `--extra-vars` argument pointing to the temporary file with system variables (see below).
+**Pass system properties**: add `--extra-vars` argument pointing to the temporary file with system variables (see below).
 
 ## Docker Settings
 
@@ -65,7 +65,7 @@ The runner will impose the following [agent requirements](https://www.jetbrains.
 * `terraform.version` exists
 * `tfenv.version` exists
 
-## System parameters
+## System properties
 
-If a corresponding option is enabled, system build parameters will be exported into a temporary JSON file. This file will be supplied as the `-var-file` value. The dots (`.`) in parameter name are replaced with underscores (`_`) to provide a valid variable identifier. 
+If a corresponding option is enabled, system properties will be exported into a temporary JSON file. This file will be supplied as the `-var-file` value. The dots (`.`) in property name are replaced with underscores (`_`) to provide a valid variable identifier. 
 If the additional arguments field contains the `-var-file` argument too, the logic will be skipped.

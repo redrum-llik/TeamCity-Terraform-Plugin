@@ -5,14 +5,13 @@
 <%@ taglib prefix="bs" tagdir="/WEB-INF/tags" %>
 
 <%@ page import="jetbrains.buildServer.runner.terraform.TerraformCommandType" %>
-<%@ page import="jetbrains.buildServer.runner.terraform.TerraformVersionMode" %>
 
 <jsp:useBean id="additionalArgumentsBean" class="jetbrains.buildServer.runner.terraformRunner.beans.AdditionalArgumentsBean"/>
 <jsp:useBean id="commandBean" class="jetbrains.buildServer.runner.terraformRunner.beans.CommandBean"/>
 <jsp:useBean id="initStageBean" class="jetbrains.buildServer.runner.terraformRunner.beans.InitStageBean"/>
 <jsp:useBean id="outputPathBean" class="jetbrains.buildServer.runner.terraformRunner.beans.OutputPathBean"/>
 <jsp:useBean id="stateBackupPathBean" class="jetbrains.buildServer.runner.terraformRunner.beans.StateBackupPathBean"/>
-<jsp:useBean id="passSystemParametersBean" class="jetbrains.buildServer.runner.terraformRunner.beans.PassSystemParametersBean"/>
+<jsp:useBean id="passSystemPropertiesBean" class="jetbrains.buildServer.runner.terraformRunner.beans.PassSystemPropertiesBean"/>
 <jsp:useBean id="versionBean" class="jetbrains.buildServer.runner.terraformRunner.beans.VersionBean"/>
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
 
@@ -77,5 +76,5 @@
 </c:if>
 
 <div class="parameter">
-    ${passSystemParametersBean.label} <props:displayCheckboxValue name="${passSystemParametersBean.key}" checkedValue="Yes" uncheckedValue="No"/>
+    ${passSystemPropertiesBean.label} <props:displayCheckboxValue name="${passSystemPropertiesBean.key}" checkedValue="Yes" uncheckedValue="No"/>
 </div>

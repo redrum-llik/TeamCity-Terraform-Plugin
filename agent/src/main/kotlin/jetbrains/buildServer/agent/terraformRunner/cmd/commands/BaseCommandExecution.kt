@@ -112,7 +112,7 @@ abstract class BaseCommandExecution(
 
         if (config.getPassSystemParams()) {
             if (checkExtraVarsInAdditionalArgs(config)) {
-                myLogger.warning("-var-file argument detected in additional arguments; TeamCity system parameters are skipped to avoid conflict")
+                myLogger.warning("-var-file argument detected in additional arguments; TeamCity system properties are skipped to avoid conflict")
             } else {
                 builder.addArgument(
                     RunnerConst.PARAM_VAR_FILE,
