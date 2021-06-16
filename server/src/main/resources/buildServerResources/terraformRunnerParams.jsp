@@ -4,13 +4,13 @@
 <%@ taglib prefix="l" tagdir="/WEB-INF/tags/layout" %>
 <%@ taglib prefix="bs" tagdir="/WEB-INF/tags" %>
 
-<jsp:useBean id="additionalArgumentsBean" class="jetbrains.buildServer.runner.terraformRunner.beans.AdditionalArgumentsBean"/>
-<jsp:useBean id="commandBean" class="jetbrains.buildServer.runner.terraformRunner.beans.CommandBean"/>
-<jsp:useBean id="initStageBean" class="jetbrains.buildServer.runner.terraformRunner.beans.InitStageBean"/>
-<jsp:useBean id="outputPathBean" class="jetbrains.buildServer.runner.terraformRunner.beans.OutputPathBean"/>
-<jsp:useBean id="stateBackupPathBean" class="jetbrains.buildServer.runner.terraformRunner.beans.StateBackupPathBean"/>
-<jsp:useBean id="passSystemPropertiesBean" class="jetbrains.buildServer.runner.terraformRunner.beans.PassSystemPropertiesBean"/>
-<jsp:useBean id="versionBean" class="jetbrains.buildServer.runner.terraformRunner.beans.VersionBean"/>
+<jsp:useBean id="additionalArgumentsBean" class="jetbrains.buildServer.terraformSupportPlugin.beans.AdditionalArgumentsBean"/>
+<jsp:useBean id="commandBean" class="jetbrains.buildServer.terraformSupportPlugin.beans.CommandBean"/>
+<jsp:useBean id="initStageBean" class="jetbrains.buildServer.terraformSupportPlugin.beans.InitStageBean"/>
+<jsp:useBean id="outputPathBean" class="jetbrains.buildServer.terraformSupportPlugin.beans.OutputPathBean"/>
+<jsp:useBean id="stateBackupPathBean" class="jetbrains.buildServer.terraformSupportPlugin.beans.StateBackupPathBean"/>
+<jsp:useBean id="passSystemPropertiesBean" class="jetbrains.buildServer.terraformSupportPlugin.beans.PassSystemPropertiesBean"/>
+<jsp:useBean id="versionBean" class="jetbrains.buildServer.terraformSupportPlugin.beans.VersionBean"/>
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
 
 <forms:workingDirectory/>
