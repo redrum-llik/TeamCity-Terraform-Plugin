@@ -1,3 +1,12 @@
+allprojects {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven(url = "https://download.jetbrains.com/teamcity-repository")
+        maven(url = "https://repo.labs.intellij.net/teamcity")
+    }
+}
+
 plugins {
     id("com.github.rodm.teamcity-common") version "1.1" apply false
     id("com.github.rodm.teamcity-agent") version "1.1" apply false
@@ -7,7 +16,7 @@ plugins {
 }
 
 ext {
-    set("teamcityVersion", "2020.2")
+    set("teamcityVersion", "2021.1")
 }
 
 group = "jetbrains.buildserver"

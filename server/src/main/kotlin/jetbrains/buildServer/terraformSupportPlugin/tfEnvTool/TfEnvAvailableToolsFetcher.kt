@@ -1,0 +1,5 @@
+package jetbrains.buildServer.terraformSupportPlugin.tfEnvTool
+
+import jetbrains.buildServer.tools.available.AvailableToolsFetcher
+
+interface TfEnvAvailableToolsFetcher: AvailableToolsFetcher

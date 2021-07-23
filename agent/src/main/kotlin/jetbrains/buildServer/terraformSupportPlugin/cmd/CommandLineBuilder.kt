@@ -1,8 +1,6 @@
 package jetbrains.buildServer.terraformSupportPlugin.cmd
 
-import com.intellij.openapi.diagnostic.Logger
-import jetbrains.buildServer.agent.runner.ProgramCommandLine
-import jetbrains.buildServer.agent.runner.SimpleProgramCommandLine
+import com.intellij.execution.configurations.GeneralCommandLine
 
 class CommandLineBuilder {
     private val arguments: ArrayList<String> = ArrayList()
@@ -10,21 +8,23 @@ class CommandLineBuilder {
     var workingDir: String = String()
     var executablePath: String = String()
 
-    fun build(): ProgramCommandLine {
-        when {
-            executablePath.isEmpty() -> {
-                throw Exception("Executable path should be specified")
-            }
-            workingDir.isEmpty() -> {
-                throw Exception("Working directory path should be specified")
-            }
-            else -> return SimpleProgramCommandLine(
-                    environment,
-                    workingDir,
-                    executablePath,
-                    arguments
-            )
+    fun build(): GeneralCommandLine {
+        if (executablePath.isEmpty()) {
+            throw Exception("Executable path should be specified")
         }
+        else if (workingDir.isEmpty()) {
+            throw Exception("Working directory path should be specified")
+        }
+
+        val commandLine = GeneralCommandLine()
+        commandLine.exePath = executablePath
+        commandLine.setWorkDirectory(workingDir)
+        commandLine.envParams = environment
+        for (argument in arguments) {
+            commandLine.addParameter(argument)
+        }
+
+        return commandLine
     }
 
     fun addArgument(argName: String? = null, value: String? = null) {
