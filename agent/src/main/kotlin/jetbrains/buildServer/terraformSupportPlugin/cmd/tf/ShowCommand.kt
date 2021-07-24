@@ -1,9 +1,11 @@
-package jetbrains.buildServer.terraformSupportPlugin.cmd
+package jetbrains.buildServer.terraformSupportPlugin.cmd.tf
 
 import jetbrains.buildServer.agent.AgentRunningBuild
 import jetbrains.buildServer.agent.FlowLogger
 import jetbrains.buildServer.terraformSupportPlugin.TerraformFeatureConfiguration
 import jetbrains.buildServer.terraformSupportPlugin.TerraformRuntimeConstants
+import jetbrains.buildServer.terraformSupportPlugin.cmd.BaseCommand
+import jetbrains.buildServer.terraformSupportPlugin.cmd.CommandLineBuilder
 import java.io.File
 
 class ShowCommand(

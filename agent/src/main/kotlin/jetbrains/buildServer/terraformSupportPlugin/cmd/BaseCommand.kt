@@ -29,12 +29,7 @@ abstract class BaseCommand(
         builder.executablePath = getExecutablePath()
 
         val checkoutDirPath = myBuild.checkoutDirectory.absolutePath
-        if (myConfiguration.useCustomWorkingDir()) {
-            val workingDirPath = Paths.get(checkoutDirPath, myConfiguration.customWorkingDirPath()!!).normalize()
-            builder.workingDir = workingDirPath.toAbsolutePath().toString()
-        } else {
-            builder.workingDir = checkoutDirPath
-        }
+        builder.workingDir = checkoutDirPath
         prepareArguments(builder)
 
         return builder.build()

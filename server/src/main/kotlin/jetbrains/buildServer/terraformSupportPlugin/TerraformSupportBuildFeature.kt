@@ -37,21 +37,6 @@ class TerraformSupportBuildFeature(descriptor: PluginDescriptor) : BuildFeature(
                 }
             }
 
-            if (config.doInit()) {
-                appendLine("Run 'terraform init' at the start of the build")
-            }
-
-            if (config.useWorkspace()) {
-                when {
-                    config.createWorkspaceIfNotFound() -> {
-                        appendLine("Use '${config.getWorkspaceName()}' workspace; create it if not found")
-                    }
-                    else -> {
-                        appendLine("Use '${config.getWorkspaceName()}' workspace; fail build if not found")
-                    }
-                }
-            }
-
             if (config.exportSystemProperties()) {
                 appendLine("Export system properties to ${config.systemPropertiesOutFile()} file")
             }

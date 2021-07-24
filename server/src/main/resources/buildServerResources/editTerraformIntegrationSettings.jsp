@@ -4,10 +4,7 @@
 <jsp:useBean id="useTfEnvBean" class="jetbrains.buildServer.terraformSupportPlugin.beans.UseTfEnvBean"/>
 <jsp:useBean id="tfEnvVersionBean" class="jetbrains.buildServer.terraformSupportPlugin.beans.TfEnvVersionBean"/>
 <jsp:useBean id="targetTerraformVersionBean" class="jetbrains.buildServer.terraformSupportPlugin.beans.TargetTerraformVersionBean"/>
-<jsp:useBean id="doInitBean" class="jetbrains.buildServer.terraformSupportPlugin.beans.DoInitBean"/>
-<jsp:useBean id="useWorkspaceBean" class="jetbrains.buildServer.terraformSupportPlugin.beans.UseWorkspaceBean"/>
-<jsp:useBean id="createWorkspaceBean" class="jetbrains.buildServer.terraformSupportPlugin.beans.CreateWorkspaceBean"/>
-<jsp:useBean id="customWorkingDirBean" class="jetbrains.buildServer.terraformSupportPlugin.beans.CustomWorkingDirBean"/>
+<jsp:useBean id="systemPropertiesBean" class="jetbrains.buildServer.terraformSupportPlugin.beans.SystemPropertiesBean"/>
 
 <tr>
     <td colspan="2">
@@ -40,37 +37,16 @@
 
 </l:settingsGroup>
 
-<l:settingsGroup title="Initialization Parameters">
-    <tr id="do_init">
-        <th><label>${doInitBean.label}</label></th>
-        <td><props:checkboxProperty name="${doInitBean.key}"/>
-            <label for="${doInitBean.key}">${doInitBean.description}</label>
-            <br/>
-        </td>
-    </tr>
-    <tr id="use_workspace">
-        <th><label for="${useWorkspaceBean.key}">${useWorkspaceBean.label}</label></th>
+<l:settingsGroup title="General Parameters">
+
+    <tr class="noBorder">
+        <th><label for="${systemPropertiesBean.key}">${systemPropertiesBean.label}</label></th>
         <td>
-            <props:textProperty name="${useWorkspaceBean.key}" className="longField" onchange="BS.Terraform.updateWorkspaceControls()"/>
-            <bs:vcsTree fieldId="${useWorkspaceBean.key}"/>
-            <span class="smallNote">${useWorkspaceBean.description}</span>
+            <props:textProperty name="${systemPropertiesBean.key}" className="longField"/>
+            <span class="smallNote">${systemPropertiesBean.description}</span>
         </td>
     </tr>
-    <tr id="create_workspace_if_not_found">
-        <th><label>${createWorkspaceBean.label}</label></th>
-        <td><props:checkboxProperty name="${createWorkspaceBean.key}"/>
-            <label for="${createWorkspaceBean.key}">${createWorkspaceBean.description}</label>
-            <br/>
-        </td>
-    </tr>
-    <tr class="advancedSetting" id="custom_working_dir">
-        <th><label for="${customWorkingDirBean.key}">${customWorkingDirBean.label}</label></th>
-        <td>
-            <props:textProperty name="${customWorkingDirBean.key}" className="longField"/>
-            <bs:vcsTree fieldId="${customWorkingDirBean.key}"/>
-            <span class="smallNote">${customWorkingDirBean.description}</span>
-        </td>
-    </tr>
+
 </l:settingsGroup>
 
 <script type="text/javascript">

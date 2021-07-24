@@ -11,10 +11,6 @@ object TerraformFeatureConstants {
     const val FEATURE_SETTING_USE_TFENV = "useTfEnv"
     const val FEATURE_SETTING_TFENV_TOOL_VERSION = "tfEnvVersion"
     const val FEATURE_SETTING_TERRAFORM_VERSION = "terraformVersion"
-    const val FEATURE_SETTING_DO_INIT_KEY = "doInit"
-    const val FEATURE_SETTING_USE_WORKSPACE_KEY = "useWorkspace"
-    const val FEATURE_SETTING_CREATE_WORKSPACE_IF_NOT_FOUND_KEY = "createWorkspace"
-    const val FEATURE_SETTING_CUSTOM_WORKING_DIR_KEY = "customWorkingDir"
     const val FEATURE_SETTING_SYSTEM_PROPERTIES = "systemProperties"
 
     // tfEnv tool data

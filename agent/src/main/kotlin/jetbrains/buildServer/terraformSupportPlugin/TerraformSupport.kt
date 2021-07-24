@@ -147,58 +147,20 @@ class TerraformSupport(
             val logger = getBuildLogger(runningBuild)
             val configuration = getFeatureConfiguration(runningBuild)
 
-            if (configuration.runInitializationStage()) {
-                ServiceMessageBlock(logger, "Terraform initialization").use {
-                    if (configuration.useTfEnv()) { // run `tfenv install/use`
-                        ServiceMessageBlock(logger, "Fetch Terraform").use {
-                            val installCommand = TfEnvInstallCommand(runningBuild, logger, configuration)
-                            val installCommandOutput = installCommand.execute()
+            if (configuration.useTfEnv()) { // run `tfenv install/use`
+                ServiceMessageBlock(logger, "[tfenv] Fetch Terraform").use {
+                    val installCommand = TfEnvInstallCommand(runningBuild, logger, configuration)
+                    val installCommandOutput = installCommand.execute()
 
-                            if (installCommandOutput.exitCode != 0) {
-                                createBuildProblem(installCommand, installCommandOutput)
-                            }
-
-                            val useCommand = TfEnvUseCommand(runningBuild, logger, configuration)
-                            val useCommandOutput = useCommand.execute()
-
-                            if (useCommandOutput.exitCode != 0) {
-                                createBuildProblem(useCommand, useCommandOutput)
-                            }
-                        }
+                    if (installCommandOutput.exitCode != 0) {
+                        createBuildProblem(installCommand, installCommandOutput)
                     }
 
-                    if (configuration.useWorkspace()) { // try to switch to specified workspace
-                        ServiceMessageBlock(logger, "Switch to workspace").use {
-                            val selectCommand = WorkspaceSelectCommand(runningBuild, logger, configuration)
-                            val selectCommandOutput = selectCommand.execute()
+                    val useCommand = TfEnvUseCommand(runningBuild, logger, configuration)
+                    val useCommandOutput = useCommand.execute()
 
-                            if (selectCommandOutput.exitCode != 0) {
-                                val noWorkspaceFound = WorkspaceSelectCommand.checkIfNoWorkspaceFoundErrorInOutput(selectCommandOutput)
-
-                                if (noWorkspaceFound && configuration.createWorkspaceIfNotFound()) {
-                                    val newCommand = WorkspaceNewCommand(runningBuild, logger, configuration)
-                                    val newCommandOutput = newCommand.execute()
-
-                                    if (newCommandOutput.exitCode != 0) {
-                                        createBuildProblem(newCommand, newCommandOutput)
-                                    }
-                                } else if (noWorkspaceFound) {
-                                    createBuildProblem(selectCommandOutput, "No workspace found")
-                                } else {
-                                    createBuildProblem(selectCommand, selectCommandOutput)
-                                }
-                            }
-                        }
-                    }
-
-                    if (configuration.doInit()) { // run 'terraform init'
-                        ServiceMessageBlock(logger, "Do init").use {
-                            val initCommand = InitCommand(runningBuild, logger, configuration)
-                            val output = initCommand.execute()
-                            if (output.exitCode != 0) {
-                                createBuildProblem(initCommand, output)
-                            }
-                        }
+                    if (useCommandOutput.exitCode != 0) {
+                        createBuildProblem(useCommand, useCommandOutput)
                     }
                 }
             }
