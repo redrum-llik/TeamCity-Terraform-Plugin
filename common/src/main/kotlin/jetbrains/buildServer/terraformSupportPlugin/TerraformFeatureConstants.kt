@@ -25,6 +25,6 @@ object TerraformFeatureConstants {
     const val HIDDEN_ARTIFACT_REPORT_FILENAME = "terraformReport.html"
     const val HIDDEN_ARTIFACT_REPORT_FOLDER = ".teamcity/terraform"
 
-    const val TFENV_TOOL_EXECUTABLE_POSTFIX = "bin/tfenv"
+    const val TFENV_TOOL_EXECUTABLE_POSTFIX = "bin"
 }
 

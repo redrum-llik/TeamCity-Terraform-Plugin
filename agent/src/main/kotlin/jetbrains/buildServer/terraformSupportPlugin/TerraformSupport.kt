@@ -10,6 +10,7 @@ import jetbrains.buildServer.messages.serviceMessages.ServiceMessageTypes
 import jetbrains.buildServer.terraformSupportPlugin.cmd.*
 import jetbrains.buildServer.terraformSupportPlugin.cmd.tfenv.TfEnvInstallCommand
 import jetbrains.buildServer.terraformSupportPlugin.cmd.tfenv.TfEnvUseCommand
+import jetbrains.buildServer.terraformSupportPlugin.loggedCommands.LoggedTerraformCommandsParser
 import jetbrains.buildServer.util.EventDispatcher
 import java.io.Closeable
 import java.io.File
@@ -112,7 +113,7 @@ class TerraformSupport(
             build,
             logger,
             TerraformRuntimeConstants.ENV_TF_LOG,
-            TerraformRuntimeConstants.ENV_TF_LOG_INFO
+            TerraformRuntimeConstants.ENV_TF_LOG_LEVEL
         )
 
         // generate a temporary file in the agent temp directory to store the logs produced by Terraform executions
@@ -182,17 +183,27 @@ class TerraformSupport(
     override fun beforeBuildFinish(runningBuild: AgentRunningBuild, buildStatus: BuildFinishedStatus) {
         if (isFeatureEnabled(runningBuild)) {
             if (isReportEnabled(runningBuild)) { // generate temporary report path
+                val logger = getBuildLogger(runningBuild)
+
+                val commandsParser = LoggedTerraformCommandsParser(myTerraformLogFile!!, logger)
+                val commands = commandsParser.getCommands()
+                for (command in commands) {
+                    logger.warning("${command.getExecutablePath()}, ${command.getCommand()}, ${command.getArguments()}")
+                    if (command.producedFile()) {
+                        logger.warning(command.getProducedFileName())
+                    }
+                }
+
                 val reportPath = File(
                     runningBuild.agentTempDirectory,
                     TerraformFeatureConstants.HIDDEN_ARTIFACT_REPORT_FILENAME
                 ).absolutePath
-                val logger = getBuildLogger(runningBuild)
 
-                generateReport(
-                    runningBuild,
-                    logger,
-                    reportPath
-                )
+//                generateReport(
+//                    runningBuild,
+//                    logger,
+//                    reportPath
+//                )
 
                 myWatcher.addNewArtifactsPath( // save report as hidden artifact
                     "$reportPath => ${TerraformFeatureConstants.HIDDEN_ARTIFACT_REPORT_FOLDER}"

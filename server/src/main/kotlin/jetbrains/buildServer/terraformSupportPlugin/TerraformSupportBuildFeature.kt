@@ -38,7 +38,7 @@ class TerraformSupportBuildFeature(descriptor: PluginDescriptor) : BuildFeature(
             }
 
             if (config.exportSystemProperties()) {
-                appendLine("Export system properties to ${config.systemPropertiesOutFile()} file")
+                appendLine("Export system properties to '${config.systemPropertiesOutFile()}' file")
             }
         }
     }
