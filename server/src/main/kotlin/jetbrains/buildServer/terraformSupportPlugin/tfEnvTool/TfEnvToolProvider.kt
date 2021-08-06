@@ -23,9 +23,9 @@ class TfEnvToolProvider(val pluginDescriptor: PluginDescriptor,
 
     private val availableTools: AvailableToolsState
 
-    val TFENV_TOOL_BUNDLED_VERSION_NUMBER = "2.2.2"
-    val TFENV_TOOL_BUNDLED_VERSION_ID = ToolVersionIdHelper.getToolId(TfEnvToolType.INSTANCE, "bundled")
-    val DOT_ZIP = ".zip"
+    private val TFENV_TOOL_BUNDLED_VERSION_NUMBER = "2.2.2"
+    private val TFENV_TOOL_BUNDLED_VERSION_ID = ToolVersionIdHelper.getToolId(TfEnvToolType.INSTANCE, "bundled")
+    private val DOT_ZIP = ".zip"
 
     init {
         availableTools = AvailableToolsStateImpl(timeService, listOf(availableToolsFetcher))
@@ -36,7 +36,7 @@ class TfEnvToolProvider(val pluginDescriptor: PluginDescriptor,
             val result = availableTools
                 .getAvailable(FetchToolsPolicy.ReturnCached)
                 .fetchedTools.map { it.id to it }.toMap()
-            if (!result.isEmpty()) field = result
+            if (result.isNotEmpty()) field = result
             return field
         }
 
@@ -44,7 +44,7 @@ class TfEnvToolProvider(val pluginDescriptor: PluginDescriptor,
         val pluginRoot = pluginDescriptor.pluginRoot.toPath()
         val path = pluginRoot.resolve("bundled").resolve(TFENV_TOOL_BUNDLED_VERSION_ID + DOT_ZIP)
         listOf(SimpleInstalledToolVersion(
-            SimpleToolVersion(getType(), TFENV_TOOL_BUNDLED_VERSION_NUMBER, TFENV_TOOL_BUNDLED_VERSION_ID),
+            SimpleToolVersion(type, TFENV_TOOL_BUNDLED_VERSION_NUMBER, TFENV_TOOL_BUNDLED_VERSION_ID),
             null, null, path.toFile()))
     }
 
@@ -66,11 +66,11 @@ class TfEnvToolProvider(val pluginDescriptor: PluginDescriptor,
 
     @Throws(ToolException::class)
     override fun fetchToolPackage(toolVersion: ToolVersion, targetDirectory: File): File {
-        val dowloadableVersion = toolVersions.get(toolVersion.id)
+        val downloadableVersion = toolVersions[toolVersion.id]
             ?: throw ToolException("Tool version ${toolVersion.id} not found")
-        val location = File(targetDirectory, dowloadableVersion.getDestinationFileName())
+        val location = File(targetDirectory, downloadableVersion.destinationFileName)
         try {
-            URLDownloader.download(dowloadableVersion.getDownloadUrl(), sslTrustStoreProvider.getTrustStore(), location)
+            URLDownloader.download(downloadableVersion.downloadUrl, sslTrustStoreProvider.trustStore, location)
         } catch (e: Throwable) {
             throw ToolException("Failed to download package " + toolVersion + " to " + location + e.message, e)
         }

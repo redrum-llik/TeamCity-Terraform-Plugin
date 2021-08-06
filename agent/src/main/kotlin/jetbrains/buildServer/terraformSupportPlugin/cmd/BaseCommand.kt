@@ -5,6 +5,7 @@ import com.intellij.execution.process.CapturingProcessHandler
 import com.intellij.execution.process.ProcessNotCreatedException
 import com.intellij.execution.process.ProcessOutput
 import jetbrains.buildServer.agent.AgentRunningBuild
+import jetbrains.buildServer.agent.BuildProgressLogger
 import jetbrains.buildServer.agent.FlowLogger
 import jetbrains.buildServer.terraformSupportPlugin.TerraformFeatureConfiguration
 import jetbrains.buildServer.terraformSupportPlugin.TerraformRuntimeConstants
@@ -13,7 +14,7 @@ import java.nio.file.Paths
 
 abstract class BaseCommand(
     protected val myBuild: AgentRunningBuild,
-    protected val myLogger: FlowLogger,
+    protected val myLogger: BuildProgressLogger,
     val myConfiguration: TerraformFeatureConfiguration
 ) {
 
@@ -31,7 +32,7 @@ abstract class BaseCommand(
 
     abstract fun prepareArguments(builder: CommandLineBuilder): CommandLineBuilder
 
-    abstract fun describe() : String
+    abstract fun describe(): String
 
     private fun makeProgramCommandLine(): GeneralCommandLine {
         val builder = CommandLineBuilder()
@@ -51,7 +52,7 @@ abstract class BaseCommand(
         }
     }
 
-    private fun logProcessOutput(output: ProcessOutput) {
+    protected open fun logProcessOutput(output: ProcessOutput) {
         //val stdOut = output.stdoutLines
         //val stdErr = output.stderrLines
 
@@ -59,19 +60,9 @@ abstract class BaseCommand(
         val stdErr = output.stderr
 
         if (stdOut.isNotEmpty()) {
-//            val b = StringBuilder()
-//            for (line in stdOut) {
-//                b.appendLine(line)
-//            }
-//            myLogger.message(b.toString())
             myLogger.message(stdOut)
         }
         if (stdErr.isNotEmpty()) {
-//            val b = StringBuilder()
-//            for (line in stdErr) {
-//                b.appendLine(line)
-//            }
-//            myLogger.warning(b.toString())
             myLogger.error(stdErr)
         }
     }
@@ -80,16 +71,11 @@ abstract class BaseCommand(
         val commandLine = makeProgramCommandLine()
         myLogger.message("Starting ${commandLine.commandLineString} in ${commandLine.workDirectory}")
 
-        try {
-            val handler = CapturingProcessHandler(commandLine.createProcess(), StandardCharsets.UTF_8)
-            val output =  handler.runProcess()
+        val handler = CapturingProcessHandler(commandLine.createProcess(), StandardCharsets.UTF_8)
+        val output = handler.runProcess()
 
-            logProcessOutput(output)
-            logProcessExitCode(output.exitCode)
-            return output
-        } catch (e: ProcessNotCreatedException) {
-            myLogger.error("Command failed: ${e.message}")
-            throw e
-        }
+        logProcessOutput(output)
+        logProcessExitCode(output.exitCode)
+        return output
     }
 }

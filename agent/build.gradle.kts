@@ -6,9 +6,15 @@ plugins {
 }
 
 dependencies {
-    compile(kotlin("stdlib"))
-    compile(project(":common"))
+    implementation(kotlin("stdlib"))
+    implementation(project(":common"))
     implementation("com.google.code.gson:gson:2.8.6")
+    implementation("com.samskivert:jmustache:1.15")
+}
+
+task<Copy>("copyDependencies") {
+    from(configurations.compileClasspath.get().resolve())
+    into("build/libs")
 }
 
 teamcity {
@@ -20,12 +26,23 @@ teamcity {
                 useSeparateClassloader = true
             }
         }
+
         archiveName = "terraform-agent"
+
+        files {
+            into("lib") {
+                from(configurations.implementation.get().allArtifacts.files)
+            }
+        }
     }
 }
 
+var mainClassName = "jetbrains.buildServer.terraformSupportPlugin.TerraformSupport"
+
 tasks.withType<Jar> {
     baseName = "terraform-agent"
+
+
 }
 
 tasks["agentPlugin"].doLast {

@@ -1,7 +1,7 @@
 package jetbrains.buildServer.terraformSupportPlugin.cmd.tf
 
 import jetbrains.buildServer.agent.AgentRunningBuild
-import jetbrains.buildServer.agent.FlowLogger
+import jetbrains.buildServer.agent.BuildProgressLogger
 import jetbrains.buildServer.terraformSupportPlugin.TerraformFeatureConfiguration
 import jetbrains.buildServer.terraformSupportPlugin.TerraformRuntimeConstants
 import jetbrains.buildServer.terraformSupportPlugin.cmd.BaseCommand
@@ -10,7 +10,7 @@ import java.io.File
 
 class ShowCommand(
     myBuild: AgentRunningBuild,
-    myLogger: FlowLogger,
+    myLogger: BuildProgressLogger,
     myConfiguration: TerraformFeatureConfiguration,
     private val myInputFile: File?
 ) : BaseCommand(myBuild, myLogger, myConfiguration) {
@@ -22,6 +22,17 @@ class ShowCommand(
         }
 
         return builder
+    }
+
+    override fun getWorkingDir(): String {
+        return when {
+            myInputFile != null -> {
+                myInputFile.parent
+            }
+            else -> {
+                super.getWorkingDir()
+            }
+        }
     }
 
     override fun describe(): String {

@@ -1,25 +1,24 @@
-package jetbrains.buildServer.terraformSupportPlugin.cmd.tfenv
+package jetbrains.buildServer.terraformSupportPlugin.cmd.tf
 
 import jetbrains.buildServer.agent.AgentRunningBuild
 import jetbrains.buildServer.agent.BuildProgressLogger
-import jetbrains.buildServer.agent.FlowLogger
 import jetbrains.buildServer.terraformSupportPlugin.TerraformFeatureConfiguration
 import jetbrains.buildServer.terraformSupportPlugin.TerraformRuntimeConstants
+import jetbrains.buildServer.terraformSupportPlugin.cmd.BaseCommand
 import jetbrains.buildServer.terraformSupportPlugin.cmd.CommandLineBuilder
+import java.io.File
 
-class TfEnvUseCommand(
+class InitCommand(
     myBuild: AgentRunningBuild,
     myLogger: BuildProgressLogger,
     myConfiguration: TerraformFeatureConfiguration
-) : BaseTfEnvCommand(myBuild, myLogger, myConfiguration) {
+) : BaseCommand(myBuild, myLogger, myConfiguration) {
     override fun prepareArguments(builder: CommandLineBuilder): CommandLineBuilder {
-        builder.addArgument(value = TerraformRuntimeConstants.PARAM_COMMAND_USE)
-        handleTerraformVersionParam(builder)
-
+        builder.addArgument(TerraformRuntimeConstants.PARAM_COMMAND_INIT)
         return builder
     }
 
     override fun describe(): String {
-        return "`tfenv use`"
+        return "`terraform init`"
     }
 }

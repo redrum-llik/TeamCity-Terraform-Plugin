@@ -3,7 +3,10 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
        default-autowire="constructor">
-    <bean id="terraformSupportBuildFeature" class="jetbrains.buildServer.terraformSupportPlugin.TerraformSupportBuildFeature"/>
-    <bean id="tfEnvToolProvider" class="jetbrains.buildServer.terraformSupportPlugin.tfEnvTool.TfEnvToolProvider" />
-    <bean id="tfEnvAvailableToolsFetcher" class="jetbrains.buildServer.terraformSupportPlugin.tfEnvTool.TfEnvAvailableToolsFetcherImpl"/>
+    <bean id="terraformSupportBuildFeature"
+          class="jetbrains.buildServer.terraformSupportPlugin.TerraformSupportBuildFeature"/>
+    <bean id="tfEnvToolProvider" class="jetbrains.buildServer.terraformSupportPlugin.tfEnvTool.TfEnvToolProvider"/>
+    <bean id="tfEnvAvailableToolsFetcher"
+          class="jetbrains.buildServer.terraformSupportPlugin.tfEnvTool.TfEnvAvailableToolsFetcherImpl"/>
+    <bean id="terraformReportTab" class="jetbrains.buildServer.terraformSupportPlugin.TerraformReportTab"/>
 </beans>

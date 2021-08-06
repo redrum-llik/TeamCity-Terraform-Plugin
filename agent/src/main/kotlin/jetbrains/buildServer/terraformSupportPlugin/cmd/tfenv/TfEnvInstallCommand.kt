@@ -1,6 +1,7 @@
 package jetbrains.buildServer.terraformSupportPlugin.cmd.tfenv
 
 import jetbrains.buildServer.agent.AgentRunningBuild
+import jetbrains.buildServer.agent.BuildProgressLogger
 import jetbrains.buildServer.agent.FlowLogger
 import jetbrains.buildServer.terraformSupportPlugin.TerraformFeatureConfiguration
 import jetbrains.buildServer.terraformSupportPlugin.TerraformRuntimeConstants
@@ -8,7 +9,7 @@ import jetbrains.buildServer.terraformSupportPlugin.cmd.CommandLineBuilder
 
 class TfEnvInstallCommand(
     myBuild: AgentRunningBuild,
-    myLogger: FlowLogger,
+    myLogger: BuildProgressLogger,
     myConfiguration: TerraformFeatureConfiguration
 ) : BaseTfEnvCommand(myBuild, myLogger, myConfiguration) {
     override fun prepareArguments(builder: CommandLineBuilder): CommandLineBuilder {

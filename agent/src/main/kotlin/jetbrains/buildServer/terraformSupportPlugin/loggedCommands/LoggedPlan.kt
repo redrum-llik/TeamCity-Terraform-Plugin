@@ -5,16 +5,14 @@ import jetbrains.buildServer.terraformSupportPlugin.TerraformRuntimeConstants
 class LoggedPlan(
     myExecutable: String,
     myCommand: String,
-    myArguments: List<String>
+    myArguments: List<String>,
+    private val myOutFile: String?
 ) : LoggedTerraformCommand(myExecutable, myCommand, myArguments) {
     override fun producedFile(): Boolean {
-        return getArguments().any { it.contains(TerraformRuntimeConstants.PARAM_COMMAND_OUT) }
+        return !myOutFile.isNullOrEmpty()
     }
 
     override fun getProducedFileName(): String {
-        return getArguments()
-            .first { it.contains(TerraformRuntimeConstants.PARAM_COMMAND_OUT) }
-            .removePrefix(TerraformRuntimeConstants.PARAM_COMMAND_OUT)
-
+        return myOutFile!!
     }
 }

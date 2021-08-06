@@ -1,6 +1,7 @@
 package jetbrains.buildServer.terraformSupportPlugin.cmd.tfenv
 
 import jetbrains.buildServer.agent.AgentRunningBuild
+import jetbrains.buildServer.agent.BuildProgressLogger
 import jetbrains.buildServer.agent.FlowLogger
 import jetbrains.buildServer.agent.ToolCannotBeFoundException
 import jetbrains.buildServer.terraformSupportPlugin.TerraformFeatureConfiguration
@@ -12,7 +13,7 @@ import java.io.File
 
 abstract class BaseTfEnvCommand(
     myBuild: AgentRunningBuild,
-    myLogger: FlowLogger,
+    myLogger: BuildProgressLogger,
     myConfiguration: TerraformFeatureConfiguration
 ) : BaseCommand(myBuild, myLogger, myConfiguration) {
     override fun getWorkingDir(): String {

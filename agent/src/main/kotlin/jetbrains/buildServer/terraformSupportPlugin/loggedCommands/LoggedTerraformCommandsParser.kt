@@ -1,10 +1,11 @@
 package jetbrains.buildServer.terraformSupportPlugin.loggedCommands
 
-import jetbrains.buildServer.agent.FlowLogger
+import jetbrains.buildServer.agent.BuildProgressLogger
 import jetbrains.buildServer.terraformSupportPlugin.TerraformRuntimeConstants
 import java.io.File
+import java.util.stream.Collectors
 
-class LoggedTerraformCommandsParser(private val logFilePath: String, private val myLogger: FlowLogger) {
+class LoggedTerraformCommandsParser(private val logFilePath: String, private val myLogger: BuildProgressLogger) {
     private val myParsedCommands = parseLoggedCommands()
 
     private fun parseLoggedCommands(): List<LoggedTerraformCommand> {
@@ -13,10 +14,10 @@ class LoggedTerraformCommandsParser(private val logFilePath: String, private val
 
         for (line in logLines) {
             if (line.matches(TerraformRuntimeConstants.TERRAFORM_LOG_CLI_ARGS_REGEX)) {
-                myLogger.debug("Detected command in the following log line: \n'${line}'")
                 val arguments = TerraformRuntimeConstants.TERRAFORM_LOG_CLI_ARGS_REGEX.find(line)
                     ?.groupValues
                     ?.get(1)
+                    ?.replace("\"", "") // arguments string has every argument encased in quotes
                     ?.split(',')
 
                 if (arguments != null) {
@@ -33,12 +34,29 @@ class LoggedTerraformCommandsParser(private val logFilePath: String, private val
     }
 
     private fun parseCommand(arguments: List<String>): LoggedTerraformCommand {
-        val executable = arguments[0]
-        val command = arguments[1]
-        val commandArguments = arguments.subList(2, arguments.size)
+        val executable = arguments[0].trim()
+        val command = arguments[1].trim()
+        val commandArguments = arguments
+            .subList(2, arguments.size)
+            .stream()
+            .map(String::trim)
+            .collect(Collectors.toList())
 
         return if (command == TerraformRuntimeConstants.PARAM_COMMAND_PLAN) {
-            LoggedPlan(executable, command, commandArguments)
+            val outArgumentIndex = commandArguments
+                .indexOf(TerraformRuntimeConstants.PARAM_COMMAND_OUT)
+
+            val outFile = try {
+                commandArguments[outArgumentIndex + 1]
+            } catch (e: IndexOutOfBoundsException) {
+                myLogger.debug(
+                    "Plan output file is missing from the registered command even though '"
+                        + TerraformRuntimeConstants.PARAM_COMMAND_OUT + "' argument was supplied"
+                )
+                null
+            }
+
+            LoggedPlan(executable, command, commandArguments, outFile)
         } else {
             LoggedCommandImpl(executable, command, commandArguments)
         }

@@ -1,0 +1,55 @@
+<h2>
+    Plan file: {{fileName}}
+</h2>
+{{#hasChangedResources}}
+<p>
+<h3>
+    Resource changes:
+</h3>
+</p>
+{{#changedResources}}
+<p>
+    {{{statusEmoji}}} {{name}} (type: <code>{{type}}</code>):
+</p>
+<p>
+    <small>
+        <small>
+            Provider: {{providerName}}
+        </small>
+    </small>
+</p>
+{{#changeItem}}
+Actions:
+<ul>
+    {{#actions}}
+    <li>
+        {{.}}
+    </li>
+    {{/actions}}
+</ul>
+{{#hasChangedValues}}
+Value changes:
+<ul>
+    {{#changedResourceValuesDelta}}
+    <li>
+        {{name}}: {{#isAdded}}{{after}}{{/isAdded}}{{#isRemoved}}<s>{{before}}</s>{{/isRemoved}}{{#isUpdated}}{{before}}->{{after}}{{/isUpdated}}
+    </li>
+    {{/changedResourceValuesDelta}}
+</ul>
+{{/hasChangedValues}}
+{{/changeItem}}
+{{/changedResources}}
+{{/hasChangedResources}}
+{{#hasChangedValues}}
+<h3>
+    Output changes:
+</h3>
+<ul>
+    {{#changedOutputValuesDelta}}
+    <li>
+        {{name}}: {{#isAdded}}{{after}}{{/isAdded}}{{#isRemoved}}<s>{{before}}</s>{{/isRemoved}}{{#isUpdated}}{{before}}->{{after}}{{/isUpdated}}
+    </li>
+    {{/changedOutputValuesDelta}}
+</ul>
+{{/hasChangedValues}}
+<hr/>

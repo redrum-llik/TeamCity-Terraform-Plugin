@@ -4,7 +4,7 @@ import jetbrains.buildServer.tools.ToolVersionIdHelper
 
 object TerraformFeatureConstants {
     // plugin-level data
-    const val FEATURE_DISPLAY_NAME = "Terraform integration"
+    const val FEATURE_DISPLAY_NAME = "Terraform Integration"
     const val FEATURE_TYPE = "terraform-integration"
 
     // feature parameters bean data
@@ -21,6 +21,9 @@ object TerraformFeatureConstants {
 
     const val BUILD_PARAM_REPORT_ENABLED = "teamcity.terraform.report.enabled"
     const val TFENV_TOOL_FETCH_URL = "teamcity.terraform.tfEnv.toolFetchUrl"
+
+    const val REPORT_TEMPLATE_FILE = "terraformChangesReportTemplate.html"
+    const val REPORT_RESOURCE_FOLDER_PATH = "/buildAgentResources"
 
     const val HIDDEN_ARTIFACT_REPORT_FILENAME = "terraformReport.html"
     const val HIDDEN_ARTIFACT_REPORT_FOLDER = ".teamcity/terraform"
