@@ -12,14 +12,14 @@ import java.io.File
 class TerraformReportGenerator(
     private val myBuild: AgentRunningBuild,
     private val myLogger: BuildProgressLogger,
-    private val myPlanDataList: List<PlanData>
+    private val myPlanData: PlanData
 ) {
     private fun getTemplate(): Template {
         val fullPath =
             "${TerraformFeatureConstants.REPORT_RESOURCE_FOLDER_PATH}${File.separator}${TerraformFeatureConstants.REPORT_TEMPLATE_FILE}"
         return when (val resource = TerraformReportGenerator::class.java.getResource(fullPath)) {
             null -> {
-                throw IllegalArgumentException("File $fullPath was not found")
+                throw IllegalArgumentException("File $fullPath was not found in plugin resources")
             }
             else -> {
                 Mustache.compiler().compile(
@@ -31,24 +31,13 @@ class TerraformReportGenerator(
 
     private val myTemplate = getTemplate()
 
-    private fun getReportPath(): String {
-        return File(
-            myBuild.agentTempDirectory,
-            TerraformFeatureConstants.HIDDEN_ARTIFACT_REPORT_FILENAME
-        ).absolutePath
-    }
-
-    fun generate(): String {
-        myLogger.debug("Generating report: ${myPlanDataList.size} plans detected")
+    fun generate(reportFile: File): String {
+        myLogger.debug("Generating report for ${myPlanData.fileName}")
 
         GsonBuilder().setPrettyPrinting().create()
-        val reportFile = File(getReportPath())
-
-        for (planData in myPlanDataList) {
-            reportFile.appendText(
-                myTemplate.execute(planData)
-            )
-        }
+        reportFile.writeText(
+            myTemplate.execute(myPlanData)
+        )
 
         return reportFile.absolutePath
     }

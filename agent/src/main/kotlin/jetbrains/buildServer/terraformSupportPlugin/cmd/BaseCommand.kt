@@ -9,6 +9,7 @@ import jetbrains.buildServer.agent.BuildProgressLogger
 import jetbrains.buildServer.agent.FlowLogger
 import jetbrains.buildServer.terraformSupportPlugin.TerraformFeatureConfiguration
 import jetbrains.buildServer.terraformSupportPlugin.TerraformRuntimeConstants
+import java.io.File
 import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
 
@@ -27,7 +28,15 @@ abstract class BaseCommand(
     }
 
     open fun getWorkingDir(): String {
-        return myBuild.checkoutDirectory.absolutePath
+        return when {
+            myConfiguration.isCustomWorkingDir() -> {
+                File(
+                    myBuild.checkoutDirectory,
+                    myConfiguration.getTerraformWorkingDir()!!
+                ).absolutePath
+            }
+            else -> myBuild.checkoutDirectory.absolutePath
+        }
     }
 
     abstract fun prepareArguments(builder: CommandLineBuilder): CommandLineBuilder

@@ -23,7 +23,6 @@ class TerraformSupportBuildFeature(descriptor: PluginDescriptor) : BuildFeature(
 
     override fun describeParameters(params: MutableMap<String, String>): String {
         return buildString {
-            appendLine("Provide report tab on changes in Terraform state")
             val config = TerraformFeatureConfiguration(params)
 
             if (config.useTfEnv()) {
@@ -35,6 +34,18 @@ class TerraformSupportBuildFeature(descriptor: PluginDescriptor) : BuildFeature(
                         appendLine("Install/use Terraform ${config.getTerraformVersion()} with tfenv")
                     }
                 }
+            }
+
+            if (config.isReportEnabled()) {
+                appendLine("Provide report tab on changes in '${config.getPlanFile()}'")
+            }
+
+            if (config.updateBuildStatus()) {
+                appendLine("Update build status with plan results")
+            }
+
+            if (config.hasProtectedResources()) {
+                appendLine("Create build problem if any of the protected resources are marked for destroy: ${config.getProtectedResources()}")
             }
 
             if (config.exportSystemProperties()) {

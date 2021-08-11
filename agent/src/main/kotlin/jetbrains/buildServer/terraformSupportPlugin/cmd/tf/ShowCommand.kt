@@ -24,17 +24,6 @@ class ShowCommand(
         return builder
     }
 
-    override fun getWorkingDir(): String {
-        return when {
-            myInputFile != null -> {
-                myInputFile.parent
-            }
-            else -> {
-                super.getWorkingDir()
-            }
-        }
-    }
-
     override fun describe(): String {
         return "`terraform show`"
     }

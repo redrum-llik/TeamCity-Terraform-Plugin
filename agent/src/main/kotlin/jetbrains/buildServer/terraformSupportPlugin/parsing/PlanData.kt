@@ -5,11 +5,11 @@ import java.util.stream.Collectors
 
 class PlanData(
     @Transient
-    val fileName: String,
+    var fileName: String = "unknown",
     @SerializedName("resource_changes")
-    val resourceChanges: List<ResourceChange>,
+    val resourceChanges: List<ResourceChange> = listOf(),
     @SerializedName("output_changes")
-    val outputChanges: Map<String, OutputChange>
+    val outputChanges: Map<String, OutputChange> = mapOf()
 ) {
     val outputValuesDelta: List<ValueDelta>
         get() {

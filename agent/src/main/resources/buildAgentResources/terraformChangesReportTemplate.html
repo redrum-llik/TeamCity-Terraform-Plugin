@@ -19,14 +19,7 @@
     </small>
 </p>
 {{#changeItem}}
-Actions:
-<ul>
-    {{#actions}}
-    <li>
-        {{.}}
-    </li>
-    {{/actions}}
-</ul>
+Actions: [{{#actions}}{{.}}{{^-last}}, {{/-last}}{{/actions}}]
 {{#hasChangedValues}}
 Value changes:
 <ul>

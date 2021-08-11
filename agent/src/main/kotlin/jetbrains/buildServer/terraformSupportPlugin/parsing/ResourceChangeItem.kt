@@ -3,7 +3,7 @@ package jetbrains.buildServer.terraformSupportPlugin.parsing
 import com.google.gson.annotations.JsonAdapter
 
 class ResourceChangeItem(
-    actions: List<Action>,
+    actions: List<Action> = listOf(Action.NO_OP),
     @JsonAdapter(ValueMapTypeAdapter::class)
     val before: Map<String, String>?,
     @JsonAdapter(ValueMapTypeAdapter::class)
@@ -12,12 +12,8 @@ class ResourceChangeItem(
     val valueKeys: Set<String>
         get() {
             val keys = mutableSetOf<String>()
-            if (before != null) {
-                keys += before.keys
-            }
-            if (after != null) {
-                keys += after.keys
-            }
+            before?.keys?.let { keys.addAll(it) }
+            after?.keys?.let { keys.addAll(it) }
             return keys
         }
 

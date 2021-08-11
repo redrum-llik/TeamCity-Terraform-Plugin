@@ -4,6 +4,10 @@
 <jsp:useBean id="useTfEnvBean" class="jetbrains.buildServer.terraformSupportPlugin.beans.UseTfEnvBean"/>
 <jsp:useBean id="tfEnvVersionBean" class="jetbrains.buildServer.terraformSupportPlugin.beans.TfEnvVersionBean"/>
 <jsp:useBean id="targetTerraformVersionBean" class="jetbrains.buildServer.terraformSupportPlugin.beans.TargetTerraformVersionBean"/>
+<jsp:useBean id="planFileBean" class="jetbrains.buildServer.terraformSupportPlugin.beans.PlanFileBean"/>
+<jsp:useBean id="terraformWorkingDirectoryBean" class="jetbrains.buildServer.terraformSupportPlugin.beans.TerraformWorkingDirectoryBean"/>
+<jsp:useBean id="updateBuildStatusBean" class="jetbrains.buildServer.terraformSupportPlugin.beans.UpdateBuildStatusBean"/>
+<jsp:useBean id="protectedResourcesBean" class="jetbrains.buildServer.terraformSupportPlugin.beans.ProtectedResourcesBean"/>
 <jsp:useBean id="systemPropertiesBean" class="jetbrains.buildServer.terraformSupportPlugin.beans.SystemPropertiesBean"/>
 
 <tr>
@@ -14,7 +18,7 @@
 
 <l:settingsGroup title="tfEnv Parameters">
 
-    <tr class="advancedSetting" id="use_tf_env">
+    <tr id="use_tf_env">
         <th><label>${useTfEnvBean.label}</label></th>
         <td><props:checkboxProperty name="${useTfEnvBean.key}" onclick="BS.Terraform.updateTfEnvControls()"/>
         </td>
@@ -37,6 +41,42 @@
 
 </l:settingsGroup>
 
+<l:settingsGroup title="Report Parameters">
+
+    <tr id="plan_file_path">
+        <th><label for="${planFileBean.key}">${planFileBean.label}</label></th>
+        <td>
+            <props:textProperty name="${planFileBean.key}" className="longField"/>
+            <span class="smallNote">${planFileBean.description}</span>
+        </td>
+    </tr>
+
+    <tr class="advancedSetting" id="tf_configuration_path">
+        <th><label for="${terraformWorkingDirectoryBean.key}">${terraformWorkingDirectoryBean.label}</label></th>
+        <td>
+            <props:textProperty name="${terraformWorkingDirectoryBean.key}" className="longField"/>
+            <span class="smallNote">${terraformWorkingDirectoryBean.description}</span>
+        </td>
+    </tr>
+
+    <tr class="advancedSetting" id="update_build_status">
+        <th><label>${updateBuildStatusBean.label}</label></th>
+        <td>
+            <props:checkboxProperty name="${updateBuildStatusBean.key}"/>
+            <span class="smallNote">${updateBuildStatusBean.description}</span>
+        </td>
+    </tr>
+
+    <tr class="advancedSetting" id="check_protected_resources">
+        <th><label for="${protectedResourcesBean.key}">${protectedResourcesBean.label}</label></th>
+        <td>
+            <props:textProperty name="${protectedResourcesBean.key}" className="longField"/>
+            <span class="smallNote">${protectedResourcesBean.description}</span>
+        </td>
+    </tr>
+
+</l:settingsGroup>
+
 <l:settingsGroup title="General Parameters">
 
     <tr class="noBorder">
@@ -51,15 +91,6 @@
 
 <script type="text/javascript">
     BS.Terraform = {
-        updateWorkspaceControls: function () {
-            const val = $('useWorkspace').value;
-            if (val == null || val.empty()) {
-                BS.Util.hide($("create_workspace_if_not_found"))
-            }
-            else {
-                BS.Util.show($("create_workspace_if_not_found"))
-            }
-        },
         updateTfEnvControls: function () {
             const val = $('useTfEnv').checked;
             if (val !== false) {
@@ -72,6 +103,5 @@
             }
         }
     }
-    BS.Terraform.updateWorkspaceControls();
     BS.Terraform.updateTfEnvControls();
 </script>
