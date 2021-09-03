@@ -2,6 +2,6 @@ package jetbrains.buildServer.terraformSupportPlugin.parsing
 
 class OutputChange(
     actions: List<Action>,
-    val before: List<String>?,
-    val after: List<String>?
+    val before: Any?,
+    val after: Any?
 ) : ActionDetails(actions)

@@ -25,27 +25,16 @@ class TerraformSupportBuildFeature(descriptor: PluginDescriptor) : BuildFeature(
         return buildString {
             val config = TerraformFeatureConfiguration(params)
 
-            if (config.useTfEnv()) {
-                when {
-                    config.getTerraformVersion().isNullOrEmpty() -> {
-                        appendLine("Automatically detect suitable Terraform version with tfenv")
-                    }
-                    else -> {
-                        appendLine("Install/use Terraform ${config.getTerraformVersion()} with tfenv")
-                    }
-                }
-            }
-
             if (config.isReportEnabled()) {
-                appendLine("Provide report tab on changes in '${config.getPlanFile()}'")
+                appendLine("Provide report tab on changes in '${config.getPlanJsonFile()}'")
             }
 
             if (config.updateBuildStatus()) {
                 appendLine("Update build status with plan results")
             }
 
-            if (config.hasProtectedResources()) {
-                appendLine("Create build problem if any of the protected resources are marked for destroy: ${config.getProtectedResources()}")
+            if (config.hasProtectedResourcePattern()) {
+                appendLine("Create build problem if any of the protected resources are marked for destroy: ${config.getProtectedResourcePattern()}")
             }
 
             if (config.exportSystemProperties()) {

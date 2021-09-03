@@ -1,14 +1,17 @@
 package jetbrains.buildServer.terraformSupportPlugin.parsing
 
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonProperty
+import jetbrains.buildServer.terraformSupportPlugin.parsing.deltas.SimpleValueDelta
+import jetbrains.buildServer.terraformSupportPlugin.parsing.deltas.ValueDelta
 import java.util.stream.Collectors
 
 class PlanData(
-    @Transient
+    @JsonIgnore
     var fileName: String = "unknown",
-    @SerializedName("resource_changes")
+    @JsonProperty("resource_changes")
     val resourceChanges: List<ResourceChange> = listOf(),
-    @SerializedName("output_changes")
+    @JsonProperty("output_changes")
     val outputChanges: Map<String, OutputChange> = mapOf()
 ) {
     val outputValuesDelta: List<ValueDelta>
@@ -17,9 +20,7 @@ class PlanData(
                 .entries
                 .stream()
                 .map {
-                    ValueDelta(
-                        it.key, it.value.before.toString(), it.value.after.toString()
-                    )
+                    ValueDelta.getValueDelta(it.key, it.value.before, it.value.after)
                 }
                 .collect(Collectors.toList())
         }

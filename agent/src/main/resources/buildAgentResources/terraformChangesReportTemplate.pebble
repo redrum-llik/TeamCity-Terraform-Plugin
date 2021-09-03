@@ -1,0 +1,94 @@
+{# START OF MACRO BLOCK #}
+{% macro renderValueDelta(valueDelta, indent=0) %}
+    {% if valueDelta.isComplex %}
+        {% if valueDelta.isList %}
+            {{ renderListValue(valueDelta,indent) }}
+        {% endif %}
+        {% if valueDelta.isMap %}
+            {{ renderMapValue(valueDelta,indent) }}
+        {% endif %}
+    {% endif %}
+    {% if not valueDelta.isComplex %}
+        {{ renderSimpleValue(valueDelta,indent) }}
+    {% endif %}
+{% endmacro %}
+
+{% macro renderMapValue(mapValueDelta, indent=0) %}
+{% autoescape false %}
+{{ mapValueDelta.changeSymbol }}
+{{ indentation(indent) }}{% if mapValueDelta.name is not empty %}<b>{{ mapValueDelta.name }}</b> = {% endif %}{<br>
+{% for nestedValueDelta in mapValueDelta.getValues -%}
+    {{ renderValueDelta(nestedValueDelta, indent = indent + 1) }}
+{% endfor %}
+{{ mapValueDelta.changeSymbol }} {{ indentation(indent) }}}<br>
+{% endautoescape %}
+{% endmacro %}
+
+{% macro renderListValue(listValueDelta, indent=0) %}
+{% autoescape false %}
+{{ listValueDelta.changeSymbol }}
+{{ indentation(indent) }}{% if listValueDelta.name is not empty %}<b>{{ listValueDelta.name }}</b> = {% endif %}[<br>
+{% for nestedValueDelta in listValueDelta.getValues -%}
+    {{ renderValueDelta(nestedValueDelta, indent = indent + 1) }}
+{% endfor %}
+{{ listValueDelta.changeSymbol }} {{ indentation(indent) }}]<br>
+{% endautoescape %}
+{% endmacro %}
+
+{% macro renderSimpleValue(simpleValueDelta, indent=0) %}
+{% autoescape false %}
+{{ simpleValueDelta.changeSymbol }}
+{{ indentation(indent) }}{% if simpleValueDelta.name is not empty %}<b>{{ simpleValueDelta.name }}</b>
+    = {% endif %}{{ simpleValueDelta.represent }}<br>
+{% endautoescape %}
+
+{% endmacro %}
+{# END OF MACRO BLOCK #}
+<h2>
+    Plan file: {{ planData.fileName }}
+</h2>
+{% if planData.hasChangedResources %}
+    <p>
+    <h3>
+        Resource changes:
+    </h3>
+    </p>
+    {% for resource in planData.changedResources %}
+        <button class="collapsible {{ resource.statusColorCSSClass }}">
+            <code>{{ resource.address }}</code> [{{ resource.changeItem.actions | join(',') }}]
+        </button>
+
+        <div class="content">
+            {% if resource.changeItem.hasChangedValues %}
+                {% for valueDelta in resource.changeItem.resourceValuesDelta.getValues %}
+                    {{ renderValueDelta(valueDelta) }}
+                {% endfor %}
+            {% endif %}
+        </div>
+    {% endfor %}
+{% endif %}
+{% if planData.hasChangedValues %}
+    <h3>
+        Output changes:
+    </h3>
+    {% for outputValueDelta in planData.changedOutputValuesDelta %}
+            {{ renderValueDelta(outputValueDelta) }}
+    {% endfor %}
+{% endif %}
+
+<script type="text/javascript">
+    var coll = document.getElementsByClassName("collapsible");
+    var i;
+
+    for (i = 0; i < coll.length; i++) {
+        coll[i].addEventListener("click", function () {
+            this.classList.toggle("active");
+            var content = this.nextElementSibling;
+            if (content.style.maxHeight) {
+                content.style.maxHeight = null;
+            } else {
+                content.style.maxHeight = content.scrollHeight + "px";
+            }
+        });
+    }
+</script>

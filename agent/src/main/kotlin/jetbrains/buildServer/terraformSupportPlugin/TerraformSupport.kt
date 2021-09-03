@@ -1,22 +1,19 @@
 package jetbrains.buildServer.terraformSupportPlugin
 
-import com.google.gson.Gson
-import com.intellij.execution.process.ProcessOutput
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import jetbrains.buildServer.BuildProblemData
 import jetbrains.buildServer.agent.*
 import jetbrains.buildServer.agent.artifacts.ArtifactsWatcher
 import jetbrains.buildServer.messages.serviceMessages.ServiceMessage
 import jetbrains.buildServer.messages.serviceMessages.ServiceMessageTypes
-import jetbrains.buildServer.terraformSupportPlugin.cmd.BaseCommand
-import jetbrains.buildServer.terraformSupportPlugin.cmd.tf.ShowCommand
-import jetbrains.buildServer.terraformSupportPlugin.cmd.tfenv.TfEnvInstallCommand
-import jetbrains.buildServer.terraformSupportPlugin.cmd.tfenv.TfEnvUseCommand
 import jetbrains.buildServer.terraformSupportPlugin.parsing.PlanData
+import jetbrains.buildServer.terraformSupportPlugin.parsing.ResourceChange
 import jetbrains.buildServer.terraformSupportPlugin.report.TerraformReportGenerator
 import jetbrains.buildServer.util.EventDispatcher
 import java.io.Closeable
 import java.io.File
-import java.io.FileWriter
 import java.util.*
 
 class TerraformSupport(
@@ -53,6 +50,12 @@ class TerraformSupport(
         return build.buildLogger.getFlowLogger(myFlowId)!!
     }
 
+    private fun getObjectMapper(): ObjectMapper {
+        return ObjectMapper()
+            .registerModule(KotlinModule(nullIsSameAsDefault = true))
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+    }
+
     private fun formatSystemProperties(build: AgentRunningBuild): MutableMap<String, String> {
         val result: MutableMap<String, String> = HashMap()
         val systemProperties = build.sharedBuildParameters.systemProperties
@@ -70,35 +73,27 @@ class TerraformSupport(
             build.checkoutDirectory,
             filePath
         ).normalize()
-        val writer = FileWriter(varFile)
-        val json = Gson().toJson(
-            formatSystemProperties(build)
-        )
-        writer.run {
-            write(json)
-            close()
-        }
+        getObjectMapper()
+            .writerWithDefaultPrettyPrinter()
+            .writeValue(
+                varFile,
+                formatSystemProperties(build)
+            )
 
         return varFile.absolutePath
     }
 
     private fun parsePlanDataFromFile(
-        runningBuild: AgentRunningBuild,
         logger: BuildProgressLogger,
-        configuration: TerraformFeatureConfiguration,
         planOutputFile: File
-    ): PlanData? {
-        val showCommand = ShowCommand(runningBuild, logger, configuration, planOutputFile)
-        val showCommandOutput = showCommand.execute()
-
-        return if (showCommandOutput.exitCode == 0) {
-            val planData = Gson().fromJson(showCommandOutput.stdout, PlanData::class.java)
-            planData.fileName = planOutputFile.name
-            planData
-        } else {
-            logger.warning("'terraform show' failed for the ${planOutputFile.name}")
-            null
-        }
+    ): PlanData {
+        logger.debug("Parsing report data from the ${planOutputFile.absolutePath}")
+        val planData = getObjectMapper().readValue(
+            planOutputFile,
+            PlanData::class.java
+        )
+        planData.fileName = planOutputFile.name
+        return planData
     }
 
     override fun sourcesUpdated(runningBuild: AgentRunningBuild) {
@@ -116,24 +111,6 @@ class TerraformSupport(
     private fun prepareEnvironment(runningBuild: AgentRunningBuild, logger: BuildProgressLogger) {
         val configuration = getFeatureConfiguration(runningBuild)
 
-        if (configuration.useTfEnv()) { // run `tfenv install/use`
-            ServiceMessageBlock(logger, "[tfenv] Fetch Terraform").use {
-                val installCommand = TfEnvInstallCommand(runningBuild, logger, configuration)
-                val installCommandOutput = installCommand.execute()
-
-                if (installCommandOutput.exitCode != 0) {
-                    createBuildProblem(installCommand, installCommandOutput)
-                }
-
-                val useCommand = TfEnvUseCommand(runningBuild, logger, configuration)
-                val useCommandOutput = useCommand.execute()
-
-                if (useCommandOutput.exitCode != 0) {
-                    createBuildProblem(useCommand, useCommandOutput)
-                }
-            }
-        }
-
         if (configuration.exportSystemProperties()) { // generate temporary file in defined path containing system vars in Terraform format
             val systemPropertiesFilePath = saveSystemPropertiesToFile(
                 runningBuild,
@@ -143,32 +120,60 @@ class TerraformSupport(
         }
     }
 
-    private fun checkProtectedResources(configuration: TerraformFeatureConfiguration, planData: PlanData?) {
-        if (planData != null) {
-            val changedProtectedResources = planData
-                .changedResources
-                .filter {
-                    it.type in configuration.getProtectedResources() &&
-                            (it.changeItem.isDeleted || it.changeItem.isReplaced)
-                }
-            changedProtectedResources.forEach {
-                createBuildProblem(
-                    "Protected resource ${it.name} is planned for destroy or replace",
-                    "Protected resource change detected"
-                )
-            }
-        }
+    private fun logResourceTypeData(
+        logger: BuildProgressLogger,
+        resource: ResourceChange,
+        pattern: String,
+        matches: Boolean
+    ) {
+        logger.debug("-=- Checking resource type ${resource.type} -=-")
+        logger.debug("isChanged: ${resource.changeItem.isChanged}, " +
+                "isDeleted: ${resource.changeItem.isDeleted}, " +
+                "isReplaced: ${resource.changeItem.isReplaced}")
+        logger.debug("matches pattern ${pattern}: $matches")
+        logger.debug("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-")
     }
 
-    private fun updateBuildStatusWithPlanData(logger: BuildProgressLogger, planData: PlanData?) {
-        if (planData != null) {
-            if (!planData.hasChangedResources) {
-                updateBuildStatus(logger, "No resource changes are planned")
-            } else if (planData.hasChangedResources && planData.changedResources.any { it.changeItem.isDeleted || it.changeItem.isReplaced }) {
-                updateBuildStatus(logger, "Some of resources are planned for replacement/destroy, check the report")
-            } else {
-                updateBuildStatus(logger, "Resource changes are planned")
+    private fun checkProtectedResources(
+        logger: BuildProgressLogger,
+        configuration: TerraformFeatureConfiguration,
+        planData: PlanData
+    ): Boolean {
+        logger.message("Handling protected resources")
+        val changedProtectedResources = planData
+            .changedResources
+            .filter {
+                val pattern = configuration.getProtectedResourcePattern()
+                val matches = pattern.matches(it.type)
+                logResourceTypeData(logger, it, pattern.toString(), matches)
+
+                matches && (it.changeItem.isDeleted || it.changeItem.isReplaced)
             }
+        changedProtectedResources.forEach {
+            createBuildProblem(
+                logger,
+                "Protected resource ${it.address} is planned for destroy or replace",
+                "Protected resource '${it.type}' is planned for destroy or replace"
+            )
+        }
+
+        return changedProtectedResources.isNotEmpty()
+    }
+
+    private fun updateBuildStatusWithPlanData(
+        logger: BuildProgressLogger,
+        planData: PlanData,
+        plannedProtectedResourceChanges: Boolean
+    ) {
+        logger.message("Updating build status")
+        if (!planData.hasChangedResources) {
+            updateBuildStatus(logger, "No resource changes are planned")
+        } else if (plannedProtectedResourceChanges) {
+            updateBuildStatus(logger, "Protected resources are planned for replacement/destroy, check the report")
+        } else if (planData.hasChangedResources && planData.changedResources.any { it.changeItem.isDeleted || it.changeItem.isReplaced }) {
+            updateBuildStatus(logger, "Some of resources are planned for replacement/destroy, check the report")
+        } else {
+            updateBuildStatus(logger, "Resource changes are planned")
         }
     }
 
@@ -189,7 +194,7 @@ class TerraformSupport(
         if (configuration.isReportEnabled()) { // generate temporary report path
             val planFile = File(
                 runningBuild.checkoutDirectory,
-                configuration.getPlanFile()!!
+                configuration.getPlanJsonFile()!!
             )
             val reportFile = File(
                 runningBuild.agentTempDirectory,
@@ -197,19 +202,16 @@ class TerraformSupport(
             )
 
             ServiceMessageBlock(logger, "Handle Terraform output").use {
-                val planData = parsePlanDataFromFile(runningBuild, logger, configuration, planFile)
-                if (planData != null) {
-                    TerraformReportGenerator(runningBuild, logger, planData).generate(reportFile)
-                } else {
-                    logger.warning("Failed to parse plan data out of ${planFile.absolutePath}")
-                }
+                val planData = parsePlanDataFromFile(logger, planFile)
+                TerraformReportGenerator(runningBuild, logger, planData).generate(reportFile)
 
-                if (configuration.hasProtectedResources()) {
-                    checkProtectedResources(configuration, planData)
+                var plannedProtectedResourceChanges: Boolean = false
+                if (configuration.hasProtectedResourcePattern()) {
+                    plannedProtectedResourceChanges = checkProtectedResources(logger, configuration, planData)
                 }
 
                 if (configuration.updateBuildStatus()) {
-                    updateBuildStatusWithPlanData(logger, planData)
+                    updateBuildStatusWithPlanData(logger, planData, plannedProtectedResourceChanges)
                 }
             }
 
@@ -244,17 +246,19 @@ class TerraformSupport(
             }
         }
 
-        fun createBuildProblem(command: BaseCommand, output: ProcessOutput) {
-            createBuildProblem(output.stderr, "${command.describe()} failed")
-        }
-
-        fun createBuildProblem(problemUniqueDescription: String, problemGenericDescription: String) {
+        fun createBuildProblem(
+            logger: BuildProgressLogger,
+            problemUniqueDescription: String,
+            problemGenericDescription: String
+        ) {
             val problemIdentityHash = problemUniqueDescription.hashCode()
 
-            BuildProblemData.createBuildProblem(
-                problemIdentityHash.toString(),
-                "TerraformExecutionProblem",
-                problemGenericDescription
+            logger.logBuildProblem(
+                BuildProblemData.createBuildProblem(
+                    problemIdentityHash.toString(),
+                    "PlannedChangesProblem",
+                    problemGenericDescription
+                )
             )
         }
 

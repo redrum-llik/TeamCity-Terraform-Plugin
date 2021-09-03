@@ -57,7 +57,10 @@ class TerraformReportTab(
             )
             model["reportString"] = reportString
         } catch (e: Exception) {
-            Loggers.SERVER.warnAndDebugDetails("Cannot process Terraform report artifact to show it in the build tab", e)
+            Loggers.SERVER.warnAndDebugDetails(
+                "Cannot process Terraform report artifact to show it in the build tab",
+                e
+            )
         }
     }
 }

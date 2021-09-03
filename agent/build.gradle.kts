@@ -1,4 +1,4 @@
-import java.util.zip.*
+import java.util.zip.ZipInputStream
 
 plugins {
     kotlin("jvm")
@@ -27,8 +27,14 @@ dependencies {
     compile(
         project(":common")
     )
-    compile("com.google.code.gson:gson:2.8.6")
-    compile("com.samskivert:jmustache:1.15")
+    compile("com.fasterxml.jackson.core:jackson-databind:2.12.4")
+    compile("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.4")
+    compile("io.pebbletemplates:pebble:3.1.5")
+    compile("com.google.guava:guava:30.1.1-jre")
+}
+
+configurations.all {
+    exclude(group = "org.slf4j")
 }
 
 var mainClassName = "jetbrains.buildServer.terraformSupportPlugin.TerraformSupport"

@@ -1,43 +1,42 @@
 package jetbrains.buildServer.terraformSupportPlugin.report
 
-import com.google.gson.GsonBuilder
-import com.samskivert.mustache.Mustache
-import com.samskivert.mustache.Template
+import com.mitchellbosecke.pebble.PebbleEngine
+import com.mitchellbosecke.pebble.loader.ClasspathLoader
+import com.mitchellbosecke.pebble.template.PebbleTemplate
 import jetbrains.buildServer.agent.AgentRunningBuild
 import jetbrains.buildServer.agent.BuildProgressLogger
 import jetbrains.buildServer.terraformSupportPlugin.TerraformFeatureConstants
 import jetbrains.buildServer.terraformSupportPlugin.parsing.PlanData
 import java.io.File
+import java.io.FileWriter
 
 class TerraformReportGenerator(
     private val myBuild: AgentRunningBuild,
     private val myLogger: BuildProgressLogger,
     private val myPlanData: PlanData
 ) {
-    private fun getTemplate(): Template {
-        val fullPath =
-            "${TerraformFeatureConstants.REPORT_RESOURCE_FOLDER_PATH}${File.separator}${TerraformFeatureConstants.REPORT_TEMPLATE_FILE}"
-        return when (val resource = TerraformReportGenerator::class.java.getResource(fullPath)) {
-            null -> {
-                throw IllegalArgumentException("File $fullPath was not found in plugin resources")
-            }
-            else -> {
-                Mustache.compiler().compile(
-                    resource.readText()
-                )
-            }
+    private fun getTemplate(): PebbleTemplate {
+        val resourcesLoader = ClasspathLoader()
+        resourcesLoader.prefix = TerraformFeatureConstants.REPORT_RESOURCE_FOLDER_PATH
+
+        val engine = PebbleEngine.Builder()
+            .extension(IndentationExtension())
+            .loader(resourcesLoader)
+            .build()
+
+        try {
+            return engine.getTemplate(TerraformFeatureConstants.REPORT_TEMPLATE_FILE)
+        } catch (e: Exception) {
+            myLogger.warning(e.stackTraceToString())
+            throw(e)
         }
     }
 
-    private val myTemplate = getTemplate()
-
     fun generate(reportFile: File): String {
-        myLogger.debug("Generating report for ${myPlanData.fileName}")
+        myLogger.message("Generating report for ${myPlanData.fileName}")
 
-        GsonBuilder().setPrettyPrinting().create()
-        reportFile.writeText(
-            myTemplate.execute(myPlanData)
-        )
+        val writer = FileWriter(reportFile)
+        getTemplate().evaluate(writer, mapOf("planData" to myPlanData))
 
         return reportFile.absolutePath
     }

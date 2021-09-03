@@ -1,16 +1,20 @@
 package jetbrains.buildServer.terraformSupportPlugin.parsing
 
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
 
 enum class Action {
-    @SerializedName("no-op")
+    @JsonProperty("no-op")
     NO_OP,
-    @SerializedName("create")
+
+    @JsonProperty("create")
     CREATE,
-    @SerializedName("read")
+
+    @JsonProperty("read")
     READ,
-    @SerializedName("update")
+
+    @JsonProperty("update")
     UPDATE,
-    @SerializedName("delete")
+
+    @JsonProperty("delete")
     DELETE;
 }
