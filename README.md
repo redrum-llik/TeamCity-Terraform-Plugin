@@ -1,17 +1,14 @@
 # Terraform plugin for TeamCity
 
 This project aims to provide a simple Terraform-related build feature for TeamCity. The key features are:
-* parse JSON output of `terraform show` to:
-  * provide a report tab summarizing the planned changes
-  * update build status
-  * raise build problem if certain resource types are planned for removal or replacement
+* parse JSON output of `terraform show`
+* provide a report tab summarizing the planned changes
+* update build status
+* raise build problem if certain resource types are planned for removal or replacement
 * ability to pass configuration parameters via `-var-file`
 
 Example of the report tab:
-
-![image](https://user-images.githubusercontent.com/63649969/132099968-5cef8b1b-9de9-4ea0-93d7-ed88ee00991e.png)
-
-The usage scenario is to build a plan file as a first build, allow to check it manually easier and, if the changes look good, apply them in the second build. There is a planned feature to allow to request approval from a sufficiently permissioned user before starting `apply` build. 
+![image](https://user-images.githubusercontent.com/63649969/113509602-27608200-955f-11eb-8438-feb62088e10a.png)
 
 # How to use
 
@@ -47,6 +44,8 @@ Examples of usage:
 * `my_db_type`: will match exactly this type of resource
 * `my_db_type|my_other_db_type`: will match both resources
 * `^((?!my_throwaway_type_of_resource).)*$`: will match anything except this resource type (whitelist)
+
+**Create if not found**: if the specified workspace has not been found, try creating it.
 
 ## General Parameters
 

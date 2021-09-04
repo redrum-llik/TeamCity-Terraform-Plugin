@@ -217,7 +217,7 @@ class TerraformSupport(
 
             myWatcher.addNewArtifactsPath( // publish report and plan file as hidden artifacts
                 buildString {
-                    appendLine("${planFile.absolutePath} => ${TerraformFeatureConstants.HIDDEN_ARTIFACT_REPORT_FOLDER}/${TerraformFeatureConstants.HIDDEN_ARTIFACT_PLAN_FILENAME}")
+                    appendLine("${planFile.absolutePath} => ${TerraformFeatureConstants.HIDDEN_ARTIFACT_REPORT_FOLDER}")
                     appendLine("${reportFile.absolutePath} => ${TerraformFeatureConstants.HIDDEN_ARTIFACT_REPORT_FOLDER}")
                 }
             )

@@ -15,29 +15,29 @@
 
 {% macro renderMapValue(mapValueDelta, indent=0) %}
 {% autoescape false %}
-{{ mapValueDelta.changeSymbol }}
+{{ mapValueDelta.changeSymbol }}&nbsp;
 {{ indentation(indent) }}{% if mapValueDelta.name is not empty %}<b>{{ mapValueDelta.name }}</b> = {% endif %}{<br>
 {% for nestedValueDelta in mapValueDelta.getValues -%}
     {{ renderValueDelta(nestedValueDelta, indent = indent + 1) }}
 {% endfor %}
-{{ mapValueDelta.changeSymbol }} {{ indentation(indent) }}}<br>
+{{ mapValueDelta.changeSymbol }}&nbsp;{{ indentation(indent) }}}<br>
 {% endautoescape %}
 {% endmacro %}
 
 {% macro renderListValue(listValueDelta, indent=0) %}
 {% autoescape false %}
-{{ listValueDelta.changeSymbol }}
+{{ listValueDelta.changeSymbol }}&nbsp;
 {{ indentation(indent) }}{% if listValueDelta.name is not empty %}<b>{{ listValueDelta.name }}</b> = {% endif %}[<br>
 {% for nestedValueDelta in listValueDelta.getValues -%}
     {{ renderValueDelta(nestedValueDelta, indent = indent + 1) }}
 {% endfor %}
-{{ listValueDelta.changeSymbol }} {{ indentation(indent) }}]<br>
+{{ listValueDelta.changeSymbol }}&nbsp;{{ indentation(indent) }}]<br>
 {% endautoescape %}
 {% endmacro %}
 
 {% macro renderSimpleValue(simpleValueDelta, indent=0) %}
 {% autoescape false %}
-{{ simpleValueDelta.changeSymbol }}
+{{ simpleValueDelta.changeSymbol }}&nbsp;
 {{ indentation(indent) }}{% if simpleValueDelta.name is not empty %}<b>{{ simpleValueDelta.name }}</b>
     = {% endif %}{{ simpleValueDelta.represent }}<br>
 {% endautoescape %}
@@ -67,7 +67,9 @@
         </div>
     {% endfor %}
 {% endif %}
+
 {% if planData.hasChangedValues %}
+    <br/>
     <h3>
         Output changes:
     </h3>
