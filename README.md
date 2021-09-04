@@ -1,71 +1,59 @@
 # Terraform plugin for TeamCity
 
-This project aims to provide a simple Terraform runner for TeamCity. The key features are:
-* wrappers for the popular commands and initialization stage (init/workspaces logic)
-* automatic detection of Terraform executable on the agent side
+This project aims to provide a simple Terraform-related build feature for TeamCity. The key features are:
+* parse JSON output of `terraform show` to:
+  * provide a report tab summarizing the planned changes
+  * update build status
+  * raise build problem if certain resource types are planned for removal or replacement
 * ability to pass configuration parameters via `-var-file`
-* ability to use [tfenv](https://github.com/tfutils/tfenv) to install/switch to the target version on the agent side
 
-Example of the build log:
-![image](https://user-images.githubusercontent.com/63649969/113509602-27608200-955f-11eb-8438-feb62088e10a.png)
+Example of the report tab:
 
-## Requirements
+![image](https://user-images.githubusercontent.com/63649969/132099968-5cef8b1b-9de9-4ea0-93d7-ed88ee00991e.png)
 
-For auto-detection mode: installed Terraform on the agent side.  
-For tfenv mode: installed tfenv on the agent side.
+The usage scenario is to build a plan file as a first build, allow to check it manually easier and, if the changes look good, apply them in the second build. There is a planned feature to allow to request approval from a sufficiently permissioned user before starting `apply` build. 
+
+# How to use
+
+* Run 
+
+```
+terraform plan -out <planfile>
+terraform show -json <planfile> >> <output file>
+```
+
+if you plan to use the produced plan file later (e.g. to run `terraform apply`), or 
+
+```
+terraform show -json >> <output file>
+```
+
+during the build.
+
+* Specify the path to output file produced by `terraform show` in the build feature. 
 
 # Configuration
 
-## Initialization Parameters
+## Report Parameters
 
-**Version**: select the Terraform version choice logic:
+**Plan changes file**: relative path to the JSON file containing `terraform show` output.
 
-* Auto-detect: use the automatically detected version on the agent side.
-* Fetch with tfenv: specify an exact version to be fetched on the agent side, or leave blank for the `tfenv` auto-detection logic.
+**Update build status**: update the build status of the build with the output results (reports whether there are any planned changes, there are none, or if some of the resources will be removed/replaced).
 
-**Init**: run `terraform init` before execution of the specified command.
+**Protected resource types**: specify Java regular expression to match against resource types. Matching resource types are treated as protected, and if plugin detects that resource is planned for removal or replacement, it will raise a build problem.
 
-**Use workspace**: try switching to the specified workspace, fail if the workspace has not been found.
+Examples of usage:
 
-**Create if not found**: if the specified workspace has not been found, try creating it.
+* `my_db_type`: will match exactly this type of resource
+* `my_db_type|my_other_db_type`: will match both resources
+* `^((?!my_throwaway_type_of_resource).)*$`: will match anything except this resource type (whitelist)
 
-## Command Parameters
+## General Parameters
 
-**Command**: select the Terraform command:
-
-* plan: invoke `terraform plan`, allows specifying a custom path for the plan output.
-* apply: invoke `terraform apply`, allows specifying a custom path to the state backup file (produced by the plan).
-* Custom: specify your own command for the execution.
-
-**Additional arguments**: any extra arguments to be passed to the command.
-
-**Pass system properties**: add `--extra-vars` argument pointing to the temporary file with system variables (see below).
-
-## Docker Settings
-
-See the relevant information on the [Docker Wrapper](https://www.jetbrains.com/help/teamcity/docker-wrapper.html) documentation page.
+**Pass system properties**: save system properties to specified path which may be used with `-var-file` argument
 
 # Implementation details
-
-## Plan output
-
-For `terraform plan`, this runner will always append the `-out` argument unless it is already available. The output file path is defined as follows:
-* if a custom output path is specified, use this path (either in the dedicated field or in the _Additional arguments_ field)
-* else, if the workspace name is defined, use `<working directory>/terraform_plan_<workspace name>.out`
-* else, use `<working directory>/terraform_plan.out`
-
-The runner will [automatically publish the output file](https://www.jetbrains.com/help/teamcity/service-messages.html#Publishing+Artifacts+while+the+Build+is+Still+in+Progress) as an artifact.
-
-## Terraform detection
-
-The detection logic will look for the `terraform` executable in `PATH` as well as in any directory defined in the `teamcity.terraform.detector.search.path` agent property. All found instances are stored in the configuration variables of the agent (see `terraform.*` variables).
-
-The runner will impose the following [agent requirements](https://www.jetbrains.com/help/teamcity/agent-requirements.html) (depending on the version choise logic described above):
-
-* `terraform.version` exists
-* `tfenv.version` exists
 
 ## System properties
 
 If a corresponding option is enabled, system properties will be exported into a temporary JSON file. This file will be supplied as the `-var-file` value. The dots (`.`) in property name are replaced with underscores (`_`) to provide a valid variable identifier. 
-If the additional arguments field contains the `-var-file` argument too, the logic will be skipped.
