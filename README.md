@@ -31,8 +31,6 @@ during the build.
 
 # Configuration
 
-## Report Parameters
-
 **Plan changes file**: relative path to the JSON file containing `terraform show` output.
 
 **Update build status**: update the build status of the build with the output results (reports whether there are any planned changes, there are none, or if some of the resources will be removed/replaced).
@@ -44,15 +42,3 @@ Examples of usage:
 * `my_db_type`: will match exactly this type of resource
 * `my_db_type|my_other_db_type`: will match both resources
 * `^((?!my_throwaway_type_of_resource).)*$`: will match anything except this resource type (whitelist)
-
-**Create if not found**: if the specified workspace has not been found, try creating it.
-
-## General Parameters
-
-**Pass system properties**: save system properties to specified path which may be used with `-var-file` argument
-
-# Implementation details
-
-## System properties
-
-If a corresponding option is enabled, system properties will be exported into a temporary JSON file. This file will be supplied as the `-var-file` value. The dots (`.`) in property name are replaced with underscores (`_`) to provide a valid variable identifier. 
