@@ -17,7 +17,7 @@ import java.util.stream.Collectors
 class TerraformReportTab(
     manager: WebControllerManager,
     buildManager: BuildsManager,
-    private val descriptor: PluginDescriptor
+    descriptor: PluginDescriptor
 ) : BuildTab(
     "terraformChangesReport",
     "Terraform Plan",

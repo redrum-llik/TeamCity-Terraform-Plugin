@@ -3,7 +3,6 @@ package jetbrains.buildServer.terraformSupportPlugin.report
 import com.mitchellbosecke.pebble.PebbleEngine
 import com.mitchellbosecke.pebble.loader.ClasspathLoader
 import com.mitchellbosecke.pebble.template.PebbleTemplate
-import jetbrains.buildServer.agent.AgentRunningBuild
 import jetbrains.buildServer.agent.BuildProgressLogger
 import jetbrains.buildServer.terraformSupportPlugin.TerraformFeatureConstants
 import jetbrains.buildServer.terraformSupportPlugin.parsing.PlanData
@@ -11,7 +10,6 @@ import java.io.File
 import java.io.FileWriter
 
 class TerraformReportGenerator(
-    private val myBuild: AgentRunningBuild,
     private val myLogger: BuildProgressLogger,
     private val myPlanData: PlanData
 ) {

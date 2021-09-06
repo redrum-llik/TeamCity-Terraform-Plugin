@@ -14,7 +14,6 @@ import jetbrains.buildServer.terraformSupportPlugin.report.TerraformReportGenera
 import jetbrains.buildServer.util.EventDispatcher
 import java.io.Closeable
 import java.io.File
-import java.util.*
 
 class TerraformSupport(
     events: EventDispatcher<AgentLifeCycleListener>,
@@ -54,33 +53,6 @@ class TerraformSupport(
         return ObjectMapper()
             .registerModule(KotlinModule(nullIsSameAsDefault = true))
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-    }
-
-    private fun formatSystemProperties(build: AgentRunningBuild): MutableMap<String, String> {
-        val result: MutableMap<String, String> = HashMap()
-        val systemProperties = build.sharedBuildParameters.systemProperties
-
-        for (parameter in systemProperties) {
-            // Terraform variables cannot include dots
-            val newKey = parameter.key.replace(".", "_")
-            result[newKey] = parameter.value
-        }
-        return result
-    }
-
-    private fun saveSystemPropertiesToFile(build: AgentRunningBuild, filePath: String): String {
-        val varFile = File(
-            build.checkoutDirectory,
-            filePath
-        ).normalize()
-        getObjectMapper()
-            .writerWithDefaultPrettyPrinter()
-            .writeValue(
-                varFile,
-                formatSystemProperties(build)
-            )
-
-        return varFile.absolutePath
     }
 
     private fun parsePlanDataFromFile(
@@ -179,9 +151,9 @@ class TerraformSupport(
 
             ServiceMessageBlock(logger, "Handle Terraform output").use {
                 val planData = parsePlanDataFromFile(logger, planFile)
-                TerraformReportGenerator(runningBuild, logger, planData).generate(reportFile)
+                TerraformReportGenerator(logger, planData).generate(reportFile)
 
-                var plannedProtectedResourceChanges: Boolean = false
+                var plannedProtectedResourceChanges = false
                 if (configuration.hasProtectedResourcePattern()) {
                     plannedProtectedResourceChanges = checkProtectedResources(logger, configuration, planData)
                 }
