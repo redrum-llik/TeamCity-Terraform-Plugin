@@ -23,12 +23,4 @@ class TerraformFeatureConfiguration(private val properties: Map<String, String>)
     fun updateBuildStatus(): Boolean {
         return properties[FeatureConst.FEATURE_SETTING_UPDATE_BUILD_STATUS].toBoolean()
     }
-
-    fun exportSystemProperties(): Boolean {
-        return !systemPropertiesOutFile().isNullOrEmpty()
-    }
-
-    fun systemPropertiesOutFile(): String? {
-        return properties[FeatureConst.FEATURE_SETTING_SYSTEM_PROPERTIES]
-    }
 }

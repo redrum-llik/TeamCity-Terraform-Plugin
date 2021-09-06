@@ -96,30 +96,6 @@ class TerraformSupport(
         return planData
     }
 
-    override fun sourcesUpdated(runningBuild: AgentRunningBuild) {
-        if (isFeatureEnabled(runningBuild)) {
-            val logger = getBuildLogger(runningBuild)
-            try {
-                prepareEnvironment(runningBuild, logger)
-            } catch (e: Exception) {
-                logger.warning(e.stackTraceToString())
-                throw e
-            }
-        }
-    }
-
-    private fun prepareEnvironment(runningBuild: AgentRunningBuild, logger: BuildProgressLogger) {
-        val configuration = getFeatureConfiguration(runningBuild)
-
-        if (configuration.exportSystemProperties()) { // generate temporary file in defined path containing system vars in Terraform format
-            val systemPropertiesFilePath = saveSystemPropertiesToFile(
-                runningBuild,
-                configuration.systemPropertiesOutFile()!!
-            )
-            logger.debug("Saved system properties at the '${systemPropertiesFilePath}' path")
-        }
-    }
-
     private fun logResourceTypeData(
         logger: BuildProgressLogger,
         resource: ResourceChange,
@@ -152,7 +128,7 @@ class TerraformSupport(
         changedProtectedResources.forEach {
             createBuildProblem(
                 logger,
-                "Protected resource ${it.address} is planned for destroy or replace",
+                "Protected resource '${it.address}' is planned for destroy or replace",
                 "Protected resource '${it.type}' is planned for destroy or replace"
             )
         }

@@ -6,7 +6,6 @@
              class="jetbrains.buildServer.terraformSupportPlugin.beans.UpdateBuildStatusBean"/>
 <jsp:useBean id="protectedResourcesBean"
              class="jetbrains.buildServer.terraformSupportPlugin.beans.ProtectedResourcesBean"/>
-<jsp:useBean id="systemPropertiesBean" class="jetbrains.buildServer.terraformSupportPlugin.beans.SystemPropertiesBean"/>
 
 <tr>
     <td colspan="2">
@@ -44,18 +43,6 @@
         <td>
             <props:textProperty name="${protectedResourcesBean.key}" className="mediumField"/>
             <span class="smallNote">${protectedResourcesBean.description}</span>
-        </td>
-    </tr>
-
-</l:settingsGroup>
-
-<l:settingsGroup title="General Parameters">
-
-    <tr class="noBorder">
-        <th><label for="${systemPropertiesBean.key}">${systemPropertiesBean.label}</label></th>
-        <td>
-            <props:textProperty name="${systemPropertiesBean.key}" className="longField"/>
-            <span class="smallNote">${systemPropertiesBean.description}</span>
         </td>
     </tr>
 

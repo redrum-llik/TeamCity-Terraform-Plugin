@@ -36,10 +36,6 @@ class TerraformSupportBuildFeature(descriptor: PluginDescriptor) : BuildFeature(
             if (config.hasProtectedResourcePattern()) {
                 appendLine("Create build problem if any of the protected resources are marked for destroy: ${config.getProtectedResourcePattern()}")
             }
-
-            if (config.exportSystemProperties()) {
-                appendLine("Export system properties to '${config.systemPropertiesOutFile()}' file")
-            }
         }
     }
 }
