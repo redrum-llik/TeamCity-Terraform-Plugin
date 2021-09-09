@@ -12,12 +12,11 @@ class TerraformFeatureConfiguration(private val properties: Map<String, String>)
     }
 
     fun hasProtectedResourcePattern(): Boolean {
-        return properties[FeatureConst.FEATURE_SETTING_PROTECTED_RESOURCES] != null
+        return !getProtectedResourcePattern().isNullOrEmpty()
     }
 
-    fun getProtectedResourcePattern(): Regex {
-        val rawString = properties[FeatureConst.FEATURE_SETTING_PROTECTED_RESOURCES]
-        return Regex(rawString!!)
+    fun getProtectedResourcePattern(): String? {
+        return properties[FeatureConst.FEATURE_SETTING_PROTECTED_RESOURCES]
     }
 
     fun updateBuildStatus(): Boolean {

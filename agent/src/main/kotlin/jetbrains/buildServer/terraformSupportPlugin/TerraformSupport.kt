@@ -12,6 +12,7 @@ import jetbrains.buildServer.terraformSupportPlugin.parsing.PlanData
 import jetbrains.buildServer.terraformSupportPlugin.parsing.ResourceChange
 import jetbrains.buildServer.terraformSupportPlugin.report.TerraformReportGenerator
 import jetbrains.buildServer.util.EventDispatcher
+import jetbrains.buildServer.util.regex.MatcherUtil
 import java.io.Closeable
 import java.io.File
 
@@ -71,14 +72,13 @@ class TerraformSupport(
     private fun logResourceTypeData(
         logger: BuildProgressLogger,
         resource: ResourceChange,
-        pattern: String,
         matches: Boolean
     ) {
         logger.debug("-=- Checking resource type ${resource.type} -=-")
         logger.debug("isChanged: ${resource.changeItem.isChanged}, " +
                 "isDeleted: ${resource.changeItem.isDeleted}, " +
                 "isReplaced: ${resource.changeItem.isReplaced}")
-        logger.debug("matches pattern ${pattern}: $matches")
+        logger.debug("matches: $matches")
         logger.debug("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-")
     }
 
@@ -87,13 +87,14 @@ class TerraformSupport(
         configuration: TerraformFeatureConfiguration,
         planData: PlanData
     ): Boolean {
-        logger.message("Handling protected resources")
+        val pattern = configuration.getProtectedResourcePattern()!!
+        logger.message("Handling protected resources (pattern: '$pattern')")
+
         val changedProtectedResources = planData
             .changedResources
             .filter {
-                val pattern = configuration.getProtectedResourcePattern()
-                val matches = pattern.matches(it.type)
-                logResourceTypeData(logger, it, pattern.toString(), matches)
+                val matches = MatcherUtil.matches(it.type, pattern, 10)
+                logResourceTypeData(logger, it, matches)
 
                 matches && (it.changeItem.isDeleted || it.changeItem.isReplaced)
             }
