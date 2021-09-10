@@ -9,17 +9,13 @@ class TerraformSupportBuildFeature(descriptor: PluginDescriptor) : BuildFeature(
         "editTerraformIntegrationSettings.jsp"
     )
 
-    override fun getType(): String {
-        return CommonConst.FEATURE_TYPE
-    }
+    override fun getType(): String = CommonConst.FEATURE_TYPE
 
-    override fun getDisplayName(): String {
-        return CommonConst.FEATURE_DISPLAY_NAME
-    }
+    override fun getDisplayName(): String = CommonConst.FEATURE_DISPLAY_NAME
 
-    override fun getEditParametersUrl(): String? {
-        return myEditUrl
-    }
+    override fun getEditParametersUrl(): String? = myEditUrl
+
+    override fun isMultipleFeaturesPerBuildTypeAllowed(): Boolean = false
 
     override fun describeParameters(params: Map<String, String>): String {
         return buildString {

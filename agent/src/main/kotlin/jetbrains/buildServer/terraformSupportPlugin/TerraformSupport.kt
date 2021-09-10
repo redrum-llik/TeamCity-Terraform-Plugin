@@ -28,21 +28,17 @@ class TerraformSupport(
         events.addListener(this)
     }
 
-    private fun isFeatureEnabled(build: AgentRunningBuild): Boolean {
-        return getFeature(build) != null
-    }
-
     private fun getFeature(build: AgentRunningBuild): AgentBuildFeature? {
         val features = build.getBuildFeaturesOfType(TerraformFeatureConstants.FEATURE_TYPE)
         if (features.isNotEmpty()) {
-            return features.first()
+            return features.first() // isMultipleFeaturesPerBuildTypeAllowed = false on server side
         }
         return null
     }
 
-    private fun getFeatureConfiguration(build: AgentRunningBuild): TerraformFeatureConfiguration {
+    private fun getFeatureConfiguration(feature: AgentBuildFeature): TerraformFeatureConfiguration {
         return TerraformFeatureConfiguration(
-            getFeature(build)!!.parameters
+            feature.parameters
         )
     }
 
@@ -127,10 +123,11 @@ class TerraformSupport(
     }
 
     override fun beforeBuildFinish(runningBuild: AgentRunningBuild, buildStatus: BuildFinishedStatus) {
-        if (!buildStatus.isFailed && isFeatureEnabled(runningBuild)) {
+        val feature = getFeature(runningBuild)
+        if (!buildStatus.isFailed && feature != null) {
             val logger = getBuildLogger(runningBuild)
             try {
-                handleTerraformOutput(runningBuild, logger)
+                handleTerraformOutput(runningBuild, feature, logger)
             } catch (e: Exception) {
                 logger.warning(e.stackTraceToString())
                 throw e
@@ -138,8 +135,12 @@ class TerraformSupport(
         }
     }
 
-    private fun handleTerraformOutput(runningBuild: AgentRunningBuild, logger: BuildProgressLogger) {
-        val configuration = getFeatureConfiguration(runningBuild)
+    private fun handleTerraformOutput(
+        runningBuild: AgentRunningBuild,
+        feature: AgentBuildFeature,
+        logger: BuildProgressLogger
+    ) {
+        val configuration = getFeatureConfiguration(feature)
         if (configuration.isReportEnabled()) { // generate temporary report path
             val planFile = File(
                 runningBuild.checkoutDirectory,
