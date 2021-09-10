@@ -21,7 +21,7 @@ class TerraformSupportBuildFeature(descriptor: PluginDescriptor) : BuildFeature(
         return myEditUrl
     }
 
-    override fun describeParameters(params: MutableMap<String, String>): String {
+    override fun describeParameters(params: Map<String, String>): String {
         return buildString {
             val config = TerraformFeatureConfiguration(params)
 
