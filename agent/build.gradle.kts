@@ -1,14 +1,8 @@
-import java.util.zip.*
+import java.util.zip.ZipInputStream
 
 plugins {
     kotlin("jvm")
     id("com.github.rodm.teamcity-agent")
-}
-
-dependencies {
-    compile(kotlin("stdlib"))
-    compile(project(":common"))
-    implementation("com.google.code.gson:gson:2.8.6")
 }
 
 teamcity {
@@ -16,16 +10,39 @@ teamcity {
 
     agent {
         descriptor {
+            project.file("teamcity-agent-plugin.xml")
             pluginDeployment {
                 useSeparateClassloader = true
             }
         }
+
         archiveName = "terraform-agent"
     }
 }
 
+dependencies {
+    compile(
+        kotlin("stdlib")
+    )
+    compile(
+        project(":common")
+    )
+    compile("com.fasterxml.jackson.core:jackson-databind:2.12.4")
+    compile("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.4")
+    compile("io.pebbletemplates:pebble:3.1.5")
+    compile("com.google.guava:guava:30.1.1-jre")
+}
+
+configurations.all {
+    exclude(group = "org.slf4j")
+}
+
+var mainClassName = "jetbrains.buildServer.terraformSupportPlugin.TerraformSupport"
+
 tasks.withType<Jar> {
     baseName = "terraform-agent"
+
+
 }
 
 tasks["agentPlugin"].doLast {

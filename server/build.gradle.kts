@@ -1,5 +1,7 @@
 import com.github.rodm.teamcity.TeamCityEnvironment
 
+val BUNDLED_TFENV_TOOL_VERSION = "2.2.2"
+
 plugins {
     kotlin("jvm")
     id("com.github.rodm.teamcity-server")
@@ -11,6 +13,7 @@ dependencies {
 
     ///for BuildProblemManager
     compileOnly("org.jetbrains.teamcity.internal:server:${rootProject.ext["teamcityVersion"]}")
+    compileOnly("org.jetbrains.teamcity.internal:server-tools:${rootProject.extra["teamcityVersion"]}")
 
     agent(project(path = ":agent", configuration = "plugin"))
 }
@@ -40,7 +43,6 @@ teamcity {
 tasks.withType<Jar> {
     baseName = "terraform-plugin"
 }
-
 
 task("teamcity") {
     dependsOn("serverPlugin")

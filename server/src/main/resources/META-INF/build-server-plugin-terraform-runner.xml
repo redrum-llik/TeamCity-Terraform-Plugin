@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
        default-autowire="constructor">
-    <bean id="terraformRunnerRunType" class="jetbrains.buildServer.runner.terraformRunner.TerraformRunType"/>
-    <bean id="terraformRunnerDetector" class="jetbrains.buildServer.runner.terraformRunner.discovery.TerraformRunnerDetector" />
+    <bean id="terraformSupportBuildFeature"
+          class="jetbrains.buildServer.terraformSupportPlugin.TerraformSupportBuildFeature"/>
+    <bean id="terraformReportTab" class="jetbrains.buildServer.terraformSupportPlugin.TerraformReportTab"/>
 </beans>
