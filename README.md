@@ -8,7 +8,7 @@ This project aims to provide a simple Terraform-related build feature for TeamCi
 * ability to pass configuration parameters via `-var-file`
 
 Example of the report tab:
-![image](https://user-images.githubusercontent.com/63649969/113509602-27608200-955f-11eb-8438-feb62088e10a.png)
+![image](https://user-images.githubusercontent.com/63649969/133670782-d2b3c061-94d2-4600-afae-f91f6cbdf24e.png)
 
 # How to use
 
