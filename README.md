@@ -10,6 +10,9 @@ This project aims to provide a simple Terraform-related build feature for TeamCi
 Example of the report tab:
 ![image](https://user-images.githubusercontent.com/63649969/133670782-d2b3c061-94d2-4600-afae-f91f6cbdf24e.png)
 
+The plugin targets a scenario where `terraform` is executed in a build chain; dependency build provides a plan file, and dependent build applies it. The build feature provided by plugin allows to control the changes introduced in plan file, review them easier and fail the plan build if necessary.
+Synergises with [Manual Approval](https://www.jetbrains.com/help/teamcity/build-approval.html) feature introduced in 2022.04. 
+
 # How to use
 
 * Run 
