@@ -5,7 +5,6 @@ This project aims to provide a simple Terraform-related build feature for TeamCi
 * provide a report tab summarizing the planned changes
 * update build status
 * raise build problem if certain resource types are planned for removal or replacement
-* ability to pass configuration parameters via `-var-file`
 
 Example of the report tab:
 ![image](https://user-images.githubusercontent.com/63649969/133670782-d2b3c061-94d2-4600-afae-f91f6cbdf24e.png)
