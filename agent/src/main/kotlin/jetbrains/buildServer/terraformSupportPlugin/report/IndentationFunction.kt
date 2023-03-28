@@ -1,9 +1,9 @@
 package jetbrains.buildServer.terraformSupportPlugin.report
 
-import com.mitchellbosecke.pebble.template.EvaluationContext
-import com.mitchellbosecke.pebble.template.PebbleTemplate
+import io.pebbletemplates.pebble.template.EvaluationContext
+import io.pebbletemplates.pebble.template.PebbleTemplate
 
-class IndentationFunction : com.mitchellbosecke.pebble.extension.Function {
+class IndentationFunction : io.pebbletemplates.pebble.extension.Function {
     override fun getArgumentNames(): MutableList<String> = mutableListOf("level")
 
     override fun execute(

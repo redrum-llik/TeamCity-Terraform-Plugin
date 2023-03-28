@@ -27,10 +27,11 @@ dependencies {
     compile(
         project(":common")
     )
-    compile("com.fasterxml.jackson.core:jackson-databind:2.12.4")
-    compile("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.4")
-    compile("io.pebbletemplates:pebble:3.1.5")
-    compile("com.google.guava:guava:30.1.1-jre")
+    compile("com.fasterxml.jackson.core:jackson-databind:2.14.2")
+    compile("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.2")
+    compile("io.pebbletemplates:pebble:3.2.0")
+    compile("com.google.guava:guava:31.1-jre")
+    implementation("org.apache.commons:commons-text:1.10.0")
 }
 
 configurations.all {
@@ -49,7 +50,7 @@ tasks["agentPlugin"].doLast {
     val zipTask = tasks["agentPlugin"] as Zip
     val zipFile = zipTask.archivePath
 
-    val entries = zipFile.inputStream().use { it ->
+    zipFile.inputStream().use { it ->
         ZipInputStream(it).use { z ->
             generateSequence { z.nextEntry }
                 .filterNot { it.isDirectory }

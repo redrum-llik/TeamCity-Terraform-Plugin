@@ -2,7 +2,6 @@ package jetbrains.buildServer.terraformSupportPlugin.parsing
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
-import jetbrains.buildServer.terraformSupportPlugin.parsing.deltas.SimpleValueDelta
 import jetbrains.buildServer.terraformSupportPlugin.parsing.deltas.ValueDelta
 import java.util.stream.Collectors
 
@@ -43,5 +42,25 @@ class PlanData(
     val hasChangedResources: Boolean
         get() {
             return changedResources.isNotEmpty()
+        }
+
+    val createdResources: List<ResourceChange>
+        get() {
+            return changedResources.filter { it.changeItem.isCreated }
+        }
+
+    val updatedResources: List<ResourceChange>
+        get() {
+            return changedResources.filter { it.changeItem.isUpdated }
+        }
+
+    val replacedResources: List<ResourceChange>
+        get() {
+            return changedResources.filter { it.changeItem.isReplaced }
+        }
+
+    val deletedResources: List<ResourceChange>
+        get() {
+            return changedResources.filter { it.changeItem.isDeleted }
         }
 }

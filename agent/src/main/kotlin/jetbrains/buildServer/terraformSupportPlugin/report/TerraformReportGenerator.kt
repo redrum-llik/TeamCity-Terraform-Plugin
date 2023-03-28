@@ -1,8 +1,8 @@
 package jetbrains.buildServer.terraformSupportPlugin.report
 
-import com.mitchellbosecke.pebble.PebbleEngine
-import com.mitchellbosecke.pebble.loader.ClasspathLoader
-import com.mitchellbosecke.pebble.template.PebbleTemplate
+import io.pebbletemplates.pebble.PebbleEngine
+import io.pebbletemplates.pebble.loader.ClasspathLoader
+import io.pebbletemplates.pebble.template.PebbleTemplate
 import jetbrains.buildServer.agent.BuildProgressLogger
 import jetbrains.buildServer.terraformSupportPlugin.TerraformFeatureConstants
 import jetbrains.buildServer.terraformSupportPlugin.parsing.PlanData

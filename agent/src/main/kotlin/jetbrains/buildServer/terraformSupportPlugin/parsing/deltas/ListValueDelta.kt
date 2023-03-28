@@ -14,20 +14,18 @@ class ListValueDelta(
     override val getValues: List<ValueDelta>
         get() {
             val result = mutableListOf<ValueDelta>()
-            before.forEach {
-                if (!after.contains(it)) {
-                    result.add(
-                        getValueDelta(before = it, after = null)
+
+            val size = maxOf(before.size, after.size)
+
+            for (i in 0 until size) {
+                result.add(
+                    getValueDelta(
+                        before = before.getOrNull(i),
+                        after = after.getOrNull(i)
                     )
-                }
+                )
             }
-            after.forEach {
-                if (!before.contains(it)) {
-                    result.add(
-                        getValueDelta(before = null, after = it)
-                    )
-                }
-            }
+
             return result
         }
 }

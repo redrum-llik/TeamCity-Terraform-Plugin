@@ -1,7 +1,5 @@
 package jetbrains.buildServer.terraformSupportPlugin.parsing.deltas
 
-import com.google.common.collect.Maps
-
 class MapValueDelta(
     name: String = "",
     override val before: Map<String, Any?> = mapOf(),
@@ -16,30 +14,19 @@ class MapValueDelta(
     override val getValues: List<ValueDelta>
         get() {
             val result = mutableListOf<ValueDelta>()
-            when {
-                before.isEmpty() -> {
-                    after.forEach { (key, value) ->
-                        result.add(
-                            getValueDelta(key, null, value)
-                        )
-                    }
-                }
-                after.isEmpty() -> {
-                    before.forEach { (key, value) ->
-                        result.add(
-                            getValueDelta(key, value, null)
-                        )
-                    }
-                }
-                else -> {
-                    val diff = Maps.difference(before, after)
-                    diff.entriesDiffering().forEach { (key, value) ->
-                        result.add(
-                            getValueDelta(key, value.leftValue(), value.rightValue())
-                        )
-                    }
-                }
+
+            val keys = before.keys + after.keys
+
+            for (key in keys) {
+                result.add(
+                    getValueDelta(
+                        key,
+                        before.getOrDefault(key, null),
+                        after.getOrDefault(key, null)
+                    )
+                )
             }
+
             return result.filter { delta -> delta.isChanged }
         }
 }

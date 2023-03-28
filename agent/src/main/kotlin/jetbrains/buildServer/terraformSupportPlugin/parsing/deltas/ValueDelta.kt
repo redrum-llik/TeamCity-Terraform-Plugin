@@ -1,5 +1,9 @@
 package jetbrains.buildServer.terraformSupportPlugin.parsing.deltas
 
+import com.fasterxml.jackson.core.JsonParseException
+import jetbrains.buildServer.terraformSupportPlugin.TerraformSupport.Companion.getObjectMapper
+import java.io.IOException
+
 abstract class ValueDelta(
     val name: String = ""
 ) {
@@ -75,19 +79,45 @@ abstract class ValueDelta(
         }
 
         @JvmStatic
-        @Suppress("UNCHECKED_CAST")
         fun getValueDelta(name: String = "", before: Any?, after: Any?): ValueDelta {
-            return when {
-                before is Map<*, *> || after is Map<*, *> -> {
-                    MapValueDelta(name, mapify(before), mapify(after))
-                }
-                before is List<*> || after is List<*> -> {
-                    ListValueDelta(name, listify(before), listify(after))
-                }
-                else -> {
-                    SimpleValueDelta(name, stringify(before), stringify(after))
-                }
+            val objectMapper = getObjectMapper()
+
+            if (before is Map<*, *> || after is Map<*, *>) {
+                return MapValueDelta(name, mapify(before), mapify(after))
             }
+
+            if (before is List<*> || after is List<*>) {
+                return ListValueDelta(name, listify(before), listify(after))
+            }
+
+            val beforeString = stringify(before)
+            val afterString = stringify(after)
+
+            try {
+                val beforeNode = objectMapper.readTree(beforeString)
+
+                if (beforeNode.isArray) {
+                    val reader = objectMapper.readerForListOf(Any::class.java)
+                    return ListValueDelta(
+                        name,
+                        reader.readValue(beforeString),
+                        reader.readValue(afterString)
+                    )
+                } else if (beforeNode.isObject) {
+                    val reader = objectMapper.readerForMapOf(Any::class.java)
+                    return MapValueDelta(
+                        name,
+                        reader.readValue(beforeString),
+                        reader.readValue(afterString)
+                    )
+                }
+            } catch (_: IOException) {
+
+            } catch (_: JsonParseException) {
+
+            }
+
+            return SimpleValueDelta(name, beforeString, afterString)
         }
     }
 }

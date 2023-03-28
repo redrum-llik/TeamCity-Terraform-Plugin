@@ -1,9 +1,9 @@
 package jetbrains.buildServer.terraformSupportPlugin.report
 
-import com.mitchellbosecke.pebble.extension.AbstractExtension
+import io.pebbletemplates.pebble.extension.AbstractExtension
 
 class IndentationExtension : AbstractExtension() {
-    override fun getFunctions(): MutableMap<String, com.mitchellbosecke.pebble.extension.Function> {
+    override fun getFunctions(): MutableMap<String, io.pebbletemplates.pebble.extension.Function> {
         return mutableMapOf(
             "indentation" to IndentationFunction()
         )

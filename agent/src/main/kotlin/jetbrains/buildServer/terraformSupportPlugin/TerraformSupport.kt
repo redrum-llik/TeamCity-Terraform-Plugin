@@ -1,7 +1,10 @@
 package jetbrains.buildServer.terraformSupportPlugin
 
+import com.fasterxml.jackson.core.json.JsonReadFeature
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.json.JsonMapper
+import com.fasterxml.jackson.module.kotlin.KotlinFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import jetbrains.buildServer.BuildProblemData
 import jetbrains.buildServer.agent.*
@@ -15,6 +18,7 @@ import jetbrains.buildServer.util.EventDispatcher
 import jetbrains.buildServer.util.regex.MatcherUtil
 import java.io.Closeable
 import java.io.File
+
 
 class TerraformSupport(
     events: EventDispatcher<AgentLifeCycleListener>,
@@ -44,12 +48,6 @@ class TerraformSupport(
 
     private fun getBuildLogger(build: AgentRunningBuild): FlowLogger {
         return build.buildLogger.getFlowLogger(myFlowId)!!
-    }
-
-    private fun getObjectMapper(): ObjectMapper {
-        return ObjectMapper()
-            .registerModule(KotlinModule(nullIsSameAsDefault = true))
-            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
     }
 
     private fun parsePlanDataFromFile(
@@ -115,10 +113,14 @@ class TerraformSupport(
             updateBuildStatus(logger, "No resource changes are planned")
         } else if (plannedProtectedResourceChanges) {
             updateBuildStatus(logger, "Protected resources are planned for replacement/destroy, check the report")
-        } else if (planData.hasChangedResources && planData.changedResources.any { it.changeItem.isDeleted || it.changeItem.isReplaced }) {
-            updateBuildStatus(logger, "Some of resources are planned for replacement/destroy, check the report")
         } else {
-            updateBuildStatus(logger, "Resource changes are planned")
+            updateBuildStatus(
+                logger,
+                "${planData.createdResources.size} to create, " +
+                        "${planData.updatedResources.size} to update, " +
+                        "${planData.replacedResources.size} to replace, " +
+                        "${planData.deletedResources.size} to delete"
+            )
         }
     }
 
@@ -233,6 +235,18 @@ class TerraformSupport(
                     arguments
                 )
             )
+        }
+
+        fun getObjectMapper(): ObjectMapper {
+            val kotlinModule = KotlinModule.Builder()
+                .configure(KotlinFeature.NullIsSameAsDefault, enabled = true)
+                .build()
+
+            return JsonMapper.builder()
+                .enable(JsonReadFeature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER)
+                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                .addModule(kotlinModule)
+                .build()
         }
     }
 }
