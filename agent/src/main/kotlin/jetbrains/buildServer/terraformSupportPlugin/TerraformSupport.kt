@@ -1,18 +1,13 @@
 package jetbrains.buildServer.terraformSupportPlugin
 
-import com.fasterxml.jackson.core.json.JsonReadFeature
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.json.JsonMapper
-import com.fasterxml.jackson.module.kotlin.KotlinFeature
-import com.fasterxml.jackson.module.kotlin.KotlinModule
 import jetbrains.buildServer.BuildProblemData
 import jetbrains.buildServer.agent.*
 import jetbrains.buildServer.agent.artifacts.ArtifactsWatcher
 import jetbrains.buildServer.messages.serviceMessages.ServiceMessage
 import jetbrains.buildServer.messages.serviceMessages.ServiceMessageTypes
-import jetbrains.buildServer.terraformSupportPlugin.parsing.PlanData
-import jetbrains.buildServer.terraformSupportPlugin.parsing.ResourceChange
+import jetbrains.buildServer.terraformSupportPlugin.jsonOutput.ParsingUtil
+import jetbrains.buildServer.terraformSupportPlugin.jsonOutput.model.PlanData
+import jetbrains.buildServer.terraformSupportPlugin.jsonOutput.model.ResourceChange
 import jetbrains.buildServer.terraformSupportPlugin.report.TerraformReportGenerator
 import jetbrains.buildServer.util.EventDispatcher
 import jetbrains.buildServer.util.regex.MatcherUtil
@@ -55,7 +50,8 @@ class TerraformSupport(
         planOutputFile: File
     ): PlanData {
         logger.debug("Parsing report data from the ${planOutputFile.absolutePath}")
-        val planData = getObjectMapper().readValue(
+        val objectMapper = ParsingUtil.getObjectMapper()
+        val planData = objectMapper.readValue(
             planOutputFile,
             PlanData::class.java
         )
@@ -68,10 +64,10 @@ class TerraformSupport(
         resource: ResourceChange,
         matches: Boolean
     ) {
-        logger.debug("-=- Checking resource type ${resource.type} -=-")
-        logger.debug("isChanged: ${resource.changeItem.isChanged}, " +
-                "isDeleted: ${resource.changeItem.isDeleted}, " +
-                "isReplaced: ${resource.changeItem.isReplaced}")
+        logger.debug("-=- Checking resource $resource -=-")
+        logger.debug("isChanged: ${resource.isChanged}, " +
+                "isDeleted: ${resource.isDeleted}, " +
+                "isReplaced: ${resource.isReplaced}")
         logger.debug("matches: $matches")
         logger.debug("-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-")
     }
@@ -90,12 +86,12 @@ class TerraformSupport(
                 val matches = MatcherUtil.matches(it.type, pattern, 10)
                 logResourceTypeData(logger, it, matches)
 
-                matches && (it.changeItem.isDeleted || it.changeItem.isReplaced)
+                matches && (it.isDeleted || it.isReplaced)
             }
         changedProtectedResources.forEach {
             createBuildProblem(
                 logger,
-                "Protected resource '${it.address}' is planned for destroy or replace",
+                "Protected resource '${it}' is planned for destroy or replace",
                 "Protected resource '${it.type}' is planned for destroy or replace"
             )
         }
@@ -235,18 +231,6 @@ class TerraformSupport(
                     arguments
                 )
             )
-        }
-
-        fun getObjectMapper(): ObjectMapper {
-            val kotlinModule = KotlinModule.Builder()
-                .configure(KotlinFeature.NullIsSameAsDefault, enabled = true)
-                .build()
-
-            return JsonMapper.builder()
-                .enable(JsonReadFeature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER)
-                .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-                .addModule(kotlinModule)
-                .build()
         }
     }
 }

@@ -1,7 +1,10 @@
-package jetbrains.buildServer.terraformSupportPlugin.parsing
+package jetbrains.buildServer.terraformSupportPlugin.jsonOutput.model
 
-open class ActionDetails(
-    val actions: List<Action>
+import jetbrains.buildServer.terraformSupportPlugin.jsonOutput.deltas.ValueDelta
+
+open class Change(
+    val actions: List<Action>,
+    val delta: ValueDelta
 ) {
     val isNotChanged: Boolean
         get() {
@@ -38,5 +41,15 @@ open class ActionDetails(
     val isUpdated: Boolean
         get() {
             return actions.size == 1 && actions.first() == Action.UPDATE
+        }
+
+    val hasChangedValues: Boolean
+        get() {
+            return getChangedValues.isNotEmpty()
+        }
+
+    val getChangedValues: List<ValueDelta>
+        get() {
+            return this.delta.getChangedValues
         }
 }

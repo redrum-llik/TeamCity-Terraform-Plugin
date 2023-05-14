@@ -5,7 +5,7 @@ import io.pebbletemplates.pebble.loader.ClasspathLoader
 import io.pebbletemplates.pebble.template.PebbleTemplate
 import jetbrains.buildServer.agent.BuildProgressLogger
 import jetbrains.buildServer.terraformSupportPlugin.TerraformFeatureConstants
-import jetbrains.buildServer.terraformSupportPlugin.parsing.PlanData
+import jetbrains.buildServer.terraformSupportPlugin.jsonOutput.model.PlanData
 import java.io.File
 import java.io.FileWriter
 

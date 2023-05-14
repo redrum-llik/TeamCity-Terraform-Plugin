@@ -1,0 +1,119 @@
+{# START OF MACRO BLOCK #}
+{% macro renderForcesReplacement(valueDelta) %}
+{# @pebvariable name="valueDelta" type="jetbrains.buildServer.terraformSupportPlugin.jsonOutput.deltas.ValueDelta" #}
+    {% if valueDelta.forcesReplacement %}
+        <span class="redTextColor"># forces replacement</span>
+    {% endif %}
+{% endmacro %}
+
+{% macro renderChangeSymbol(changeType, spaces=1) %}
+{# @pebvariable name="changeType" type="jetbrains.buildServer.terraformSupportPlugin.report.ChangeType" #}
+{# @pebvariable name="spaces" type="Integer" #}
+    <span class="{{ changeType.cssClass }}">
+        {{ changeType.symbol }}
+        {% for i in 1..spaces %}
+            &nbsp;
+        {% endfor %}
+    </span>
+{% endmacro %}
+
+{% macro renderNameBlock(valueDelta, _name="") %}
+{# @pebvariable name="valueDelta" type="jetbrains.buildServer.terraformSupportPlugin.jsonOutput.deltas.ValueDelta" #}
+{# @pebvariable name="_name" type="String" #}
+    {% if _name is not empty %}
+        <b>{{ _name }}</b> =
+    {% elseif valueDelta.name is not empty %}
+        <b>{{ valueDelta.name }}</b> =
+    {% endif %}
+{% endmacro %}
+
+{% macro renderValueDelta(valueDelta, indent=0, _name="") %}
+{# @pebvariable name="valueDelta" type="jetbrains.buildServer.terraformSupportPlugin.jsonOutput.deltas.ValueDelta" #}
+{# @pebvariable name="indent" type="Integer" #}
+{# @pebvariable name="_name" type="String" #}
+    {% if valueDelta.isComplex %}
+        {{ renderComplexValueDelta(valueDelta, indent, _name) }}
+    {% endif %}
+    {% if not valueDelta.isComplex %}
+        {{ renderSimpleValueDelta(valueDelta, indent, _name) }}
+    {% endif %}
+{% endmacro %}
+
+{% macro renderComplexValueDelta(valueDelta, indent, _name) %}
+{# @pebvariable name="valueDelta" type="jetbrains.buildServer.terraformSupportPlugin.jsonOutput.deltas.ComplexValueDelta" #}
+{# @pebvariable name="indent" type="Integer" #}
+{# @pebvariable name="spaces" type="Integer" #}
+{# @pebvariable name="_name" type="String" #}
+{# @pebvariable name="indentation" type="jetbrains.buildServer.terraformSupportPlugin.report.IndentationFunction" #}
+    {% autoescape false %}
+    {{ renderChangeSymbol(valueDelta.changeType) }}{{ indentation(indent) }}{{ renderNameBlock(valueDelta, _name = _name) }}{{ valueDelta.openingBracket }}{{ renderForcesReplacement(valueDelta) }}<br>
+    {% for nestedValueDelta in valueDelta.getChangedValues -%}
+        {{ renderValueDelta(nestedValueDelta, indent = indent + 1) }}
+    {% endfor %}
+    {{ renderChangeSymbol(valueDelta.changeType, spaces = 2) }}{{ indentation(indent) }}{{ valueDelta.closingBracket }}<br>
+    {% endautoescape %}
+{% endmacro %}
+
+{% macro renderSimpleValueDelta(simpleValueDelta, indent=0, _name) %}
+{# @pebvariable name="simpleValueDelta" type="jetbrains.buildServer.terraformSupportPlugin.jsonOutput.deltas.SimpleValueDelta" #}
+{# @pebvariable name="indent" type="Integer" #}
+{# @pebvariable name="_name" type="String" #}
+{# @pebvariable name="indentation" type="jetbrains.buildServer.terraformSupportPlugin.report.IndentationFunction" #}
+    {% autoescape false %}
+    {{ renderChangeSymbol(simpleValueDelta.changeType) }}{{ indentation(indent) }}{{ renderNameBlock(simpleValueDelta, _name = _name) }}{{ simpleValueDelta.represent }}{{ renderForcesReplacement(simpleValueDelta) }}<br>
+    {% endautoescape %}
+{% endmacro %}
+{# END OF MACRO BLOCK #}
+{# @pebvariable name="planData" type="jetbrains.buildServer.terraformSupportPlugin.jsonOutput.model.PlanData" #}
+{# @pebvariable name="_name" type="String" #}
+<h2>
+    Plan file: {{ planData.fileName }}
+</h2>
+{% if planData.hasChangedResources %}
+    <p>
+    <h3>
+        Planned resource changes:
+    </h3>
+    </p>
+    {% for resource in planData.changedResources %}
+        <button class="collapsible {{ resource.collapsibleButtonColorCSSClass }}">
+            <small>{{ resource.moduleAddress }}</small><br>
+            {{ resource.name }} [{{ resource.actions | join(',') }}]
+        </button>
+
+        <div class="content">
+            {% if resource.hasChangedValues %}
+                {% for valueDelta in resource.getChangedValues %}
+                    {{ renderValueDelta(valueDelta) }}
+                {% endfor %}
+            {% endif %}
+        </div>
+    {% endfor %}
+{% endif %}
+
+{% if planData.getHasChangedOutputValues %}
+    <br/>
+    <h3>
+        Planned output value changes:
+    </h3>
+    {% for entry in planData.getChangedOutputValues.entrySet() %}
+        {{ renderValueDelta(entry.value.delta, _name = entry.key) }}
+    {% endfor %}
+{% endif %}
+
+<script type="text/javascript">
+    var coll = document.getElementsByClassName("collapsible");
+    var i;
+
+    for (i = 0; i < coll.length; i++) {
+        coll[i].addEventListener("click", function () {
+            this.classList.toggle("active");
+            var content = this.nextElementSibling;
+            if (content.style.maxHeight) {
+                content.style.maxHeight = null;
+            } else {
+                content.style.maxHeight = content.scrollHeight + "px";
+            }
+        });
+    }
+</script>

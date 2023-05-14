@@ -2,7 +2,7 @@
     background-color: #777;
     color: white;
     cursor: pointer;
-    padding: 18px;
+    padding: 9px;
     width: 100%;
     border: none;
     text-align: left;
@@ -28,6 +28,22 @@
 
 .fallbackBackground {
     background: #292b2c;
+}
+
+.greenTextColor {
+    color: #5cb85c;
+}
+
+.orangeTextColor {
+    color: #f0ad4e;
+}
+
+.redTextColor {
+    color: #d9534f;
+}
+
+.fallbackTextColor {
+    color: #292b2c;
 }
 
 .collapsible:hover {

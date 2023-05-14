@@ -11,7 +11,7 @@ object TerraformFeatureConstants {
     const val FEATURE_SETTING_PROTECTED_RESOURCES = "protectedResources"
 
     // internal properties
-    const val REPORT_TEMPLATE_FILE = "terraformChangesReportTemplate.pebble"
+    const val REPORT_TEMPLATE_FILE = "terraformChangesReportTemplate.peb"
     const val REPORT_RESOURCE_FOLDER_PATH = "buildAgentResources"
 
     const val HIDDEN_ARTIFACT_REPORT_FILENAME = "terraformReport.html"
