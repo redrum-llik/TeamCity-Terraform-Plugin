@@ -50,6 +50,10 @@ open class Change(
 
     val getChangedValues: List<ValueDelta>
         get() {
-            return this.delta.getChangedValues
+            val changedValues = this.delta.getChangedValues
+            if (isReplaced) {
+                return changedValues.filter { it.isUpdated }
+            }
+            return changedValues
         }
 }

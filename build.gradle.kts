@@ -1,3 +1,6 @@
+import java.text.SimpleDateFormat
+import java.util.*
+
 allprojects {
     repositories {
         mavenLocal()
@@ -20,8 +23,13 @@ ext {
 }
 
 group = "jetbrains.buildserver"
-version = System.getenv("BUILD_NUMBER") ?: "1.0-dev"
-
+val envBuildNumber = System.getenv("BUILD_NUMBER")
+if (envBuildNumber != null) {
+    version = envBuildNumber
+} else {
+    val sdf = SimpleDateFormat("yyyyMMdd")
+    version = sdf.format(Date())
+}
 
 subprojects {
 
