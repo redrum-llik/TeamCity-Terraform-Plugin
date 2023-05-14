@@ -144,6 +144,11 @@ class TerraformSupport(
                 runningBuild.checkoutDirectory,
                 configuration.getPlanJsonFile()!!
             )
+
+            if (!planFile.exists()) {
+                throw IllegalStateException("File ${planFile.absolutePath} does not exist, cannot parse Terraform plan info")
+            }
+
             val reportFile = File(
                 runningBuild.agentTempDirectory,
                 TerraformFeatureConstants.HIDDEN_ARTIFACT_REPORT_FILENAME

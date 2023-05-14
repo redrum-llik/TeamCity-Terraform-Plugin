@@ -77,7 +77,7 @@
     </p>
     {% for resource in planData.changedResources %}
         <button class="collapsible {{ resource.collapsibleButtonColorCSSClass }}">
-            <small>{{ resource.moduleAddress }}</small><br>
+            <small>{{ resource.addressPrefix }}</small><br>
             {{ resource.name }} [{{ resource.actions | join(',') }}]
         </button>
 

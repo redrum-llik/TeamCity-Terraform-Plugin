@@ -27,7 +27,11 @@ class ResourceChangeDeserializer(vc: Class<*>?) : StdDeserializer<ResourceChange
             null
         }
         val type: String = node["type"].asText()
-        val moduleAddress: String = node["module_address"].asText()
+        val moduleAddress: String? = if (node.contains("module_address")) {
+            node["module_address"].asText()
+        } else {
+            null
+        }
 
         val changeNode = node["change"]
         val parser = changeNode.traverse(jp.codec)

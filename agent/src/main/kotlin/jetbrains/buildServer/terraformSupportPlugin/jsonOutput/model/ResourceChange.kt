@@ -6,14 +6,14 @@ import jetbrains.buildServer.terraformSupportPlugin.report.ChangeItemBackground
 class ResourceChange(
     val name: String,
     val type: String,
-    val moduleAddress: String,
+    val moduleAddress: String?,
     actions: List<Action>,
     delta: ValueDelta
 ) : Change(actions, delta) {
     constructor(
         name: String,
         type: String,
-        moduleAddress: String,
+        moduleAddress: String?,
         change: Change
     ) : this(name, type, moduleAddress, change.actions, change.delta)
 
@@ -25,6 +25,15 @@ class ResourceChange(
                 isReplaced -> ChangeItemBackground.ORANGE.cssClass
                 isDeleted -> ChangeItemBackground.RED.cssClass
                 else -> ChangeItemBackground.FALLBACK.cssClass
+            }
+        }
+
+    val addressPrefix: String
+        get() {
+            return if (!moduleAddress.isNullOrEmpty()) {
+                "$moduleAddress.$type"
+            } else {
+                type
             }
         }
 

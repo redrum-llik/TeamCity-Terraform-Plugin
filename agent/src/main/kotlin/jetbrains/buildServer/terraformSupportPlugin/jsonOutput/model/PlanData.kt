@@ -2,7 +2,6 @@ package jetbrains.buildServer.terraformSupportPlugin.jsonOutput.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
-import jetbrains.buildServer.log.Loggers
 
 class PlanData(
     @JsonIgnore
@@ -19,9 +18,6 @@ class PlanData(
 
     val hasChangedOutputValues: Boolean
         get() {
-            for (value in changedOutputValues) {
-                Loggers.AGENT.warn(value.value.getChangedValues.joinToString { it.name + "=" + it.changeType.symbol } + "|" + value.value.hasChangedValues)
-            }
             return changedOutputValues.isNotEmpty()
         }
 

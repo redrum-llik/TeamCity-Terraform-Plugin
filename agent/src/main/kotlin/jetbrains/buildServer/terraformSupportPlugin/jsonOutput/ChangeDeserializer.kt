@@ -117,7 +117,8 @@ class ChangeDeserializer(vc: Class<*>?) : StdDeserializer<Change>(vc) {
                 .forEach { keys.add(it.key) }
         }
 
-        val matchingReplacePaths = getMatchingReplacePaths(name, replacePaths)
+        val matchingReplacePaths = replacePaths
+            .filter { it.getOrNull(0) == name || name.isEmpty() }
 
         for (key in keys) {
             deltas.add(
@@ -125,13 +126,13 @@ class ChangeDeserializer(vc: Class<*>?) : StdDeserializer<Change>(vc) {
                     key,
                     beforeMap.getOrDefault(key, NullNode.getInstance()),
                     afterMap.getOrDefault(key, NullNode.getInstance()),
-                    trimReplacePaths(matchingReplacePaths)
+                    trimReplacePaths(name, matchingReplacePaths)
                 )
             )
         }
 
         val forcesReplacement = matchingReplacePaths
-            .any { it.size == 1 }
+            .any { it.size == 1 && it[0] == name}
 
         return MapValueDelta(
             name = name,
@@ -176,8 +177,11 @@ class ChangeDeserializer(vc: Class<*>?) : StdDeserializer<Change>(vc) {
             )
         }
 
-        val forcesReplacement = getMatchingReplacePaths(name, replacePaths)
+        val forcesReplacement = replacePaths
+            .filter { it.getOrNull(0) == name }
             .any { it.size == 1 }
+
+
 
         return ListValueDelta(
             name = name,
@@ -214,13 +218,15 @@ class ChangeDeserializer(vc: Class<*>?) : StdDeserializer<Change>(vc) {
                 return parseArrayValueDelta(
                     name = name,
                     before = beforeNode,
-                    after = afterNode
+                    after = afterNode,
+                    replacePaths = replacePaths
                 )
             } else if (beforeNode.isObject) {
                 return parseMapValueDelta(
                     name = name,
                     before = beforeNode,
-                    after = afterNode
+                    after = afterNode,
+                    replacePaths = replacePaths
                 )
             }
         } catch (_: IOException) {
@@ -229,7 +235,8 @@ class ChangeDeserializer(vc: Class<*>?) : StdDeserializer<Change>(vc) {
 
         }
 
-        val forcesReplacement = getMatchingReplacePaths(name, replacePaths)
+        val forcesReplacement = replacePaths
+            .filter { it.getOrNull(0) == name }
             .any { it.size == 1 }
 
         return SimpleValueDelta(
@@ -240,16 +247,8 @@ class ChangeDeserializer(vc: Class<*>?) : StdDeserializer<Change>(vc) {
         )
     }
 
-    private fun getMatchingReplacePaths(
-        name: String,
-        replacePaths: List<List<String>>
-    ): List<List<String>> {
-        return replacePaths.filter {
-            it.getOrNull(0) == name
-        }
-    }
-
     private fun trimReplacePaths(
+        name: String,
         replacePaths: List<List<String>>
     ): List<List<String>> {
         val result = mutableListOf<List<String>>()
@@ -257,6 +256,8 @@ class ChangeDeserializer(vc: Class<*>?) : StdDeserializer<Change>(vc) {
         replacePaths.forEach {
             if (it.size > 1) {
                 result.add(it.slice(1..it.size))
+            } else if (it.isNotEmpty() && name.isEmpty()) {
+                result.add(it)
             }
         }
 
